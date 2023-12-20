@@ -1,7 +1,6 @@
-<<<<<<< Updated upstream
 from datetime import datetime
+from datetime import timedelta
 from .Contact import Contact
-=======
 from .Name import Name
 from .Phone import Phone
 from .Birthday import Birthday
@@ -10,7 +9,6 @@ from .Email import Email
 from datetime import datetime
 import locale
 
->>>>>>> Stashed changes
 
 class ContactBook:
     def __init__(self):
@@ -19,7 +17,6 @@ class ContactBook:
     def add_contact(self, contact):
         self.contacts.append(contact)
 
-<<<<<<< Updated upstream
     def validate_name(self, name):
         return len(name) >= 2 and name.isalpha()
 
@@ -67,13 +64,12 @@ class ContactBook:
         self.add_contact(contact)
         print("Контакт додано!\n")
     
-=======
->>>>>>> Stashed changes
+
     def display_contacts(self):
         for contact in self.contacts:
             print(f"Name: {contact.name}\nPhone: {contact.phone_number}\n{'='*30}")
 
-<<<<<<< Updated upstream
+
     def upcoming_birthdays(self, days):
         """
         Виводить список контактів, у яких день народження відбудеться через задану кількість днів від поточної дати.
@@ -98,7 +94,7 @@ class ContactBook:
         """Пошук контакту за ключовим словом."""
         results = [contact for contact in self.contacts if keyword.lower() in contact.name.lower()]
         return results
-=======
+
     def search_contact(self, keyword):
         results = [contact for contact in self.contacts if keyword.lower() in str(contact.name.value).lower()]
 
@@ -148,7 +144,6 @@ class ContactBook:
         matching_birthdays = []
         today = datetime.today().date()
 
-        # Встановлення локалі для української мови
         locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
 
         for contact in self.contacts:
@@ -172,8 +167,6 @@ class ContactBook:
                 user_info = f"{name}: {day_of_week}, {formatted_date}"
                 matching_birthdays.append(user_info)
 
-        # Повернення локалі на мову за замовчуванням
         locale.setlocale(locale.LC_TIME, '')
 
         return matching_birthdays
->>>>>>> Stashed changes

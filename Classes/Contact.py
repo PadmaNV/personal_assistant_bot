@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 class Contact:
     def __init__(self, name, address, phone_number, email, birthday):
         self.name = name
@@ -6,7 +5,7 @@ class Contact:
         self.phone_number = phone_number
         self.email = email
         self.birthday = birthday
-=======
+
 from .Field import Field
 from .Name import Name
 
@@ -17,4 +16,3 @@ class Contact:
         self.phone_number = Field(phone_number)
         self.email = Field(email)
         self.birthday = Field(birthday)
->>>>>>> Stashed changes
