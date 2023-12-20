@@ -8,6 +8,7 @@ from .Contact import Contact
 from .Email import Email
 from datetime import datetime
 import locale
+import pickle
 
 
 class ContactBook:
@@ -67,7 +68,7 @@ class ContactBook:
 
     def display_contacts(self):
         for contact in self.contacts:
-            print(f"Name: {contact.name}\nPhone: {contact.phone_number}\n{'='*30}")
+            print(f"Name: {contact.data['name']}\nPhone: {contact.data['phone_number']}\n{'='*30}")
 
 
     def upcoming_birthdays(self, days):
@@ -79,44 +80,29 @@ class ContactBook:
 
         upcoming_birthdays_list = [
             contact for contact in self.contacts
-            if contact.birthday and self.validate_birthday(contact.birthday)
-            and datetime.strptime(contact.birthday, '%d.%m.%Y').date() == upcoming_date
+            if contact.data['birthday'] and self.validate_birthday(contact.data['birthday'])
+            and datetime.strptime(contact.data['birthday'], '%d.%m.%Y').date() == upcoming_date
         ]
 
         if upcoming_birthdays_list:
             print(f"Контакти з днями народження через {days} днів:")
             for contact in upcoming_birthdays_list:
-                print(f"Name: {contact.name}\nBirthday: {contact.birthday}\n{'='*30}")
+                print(f"Name: {contact.data['name']}\nBirthday: {contact.data['birthday']}\n{'='*30}")
         else:
             print(f"На жаль, немає контактів з днями народження через {days} днів.")
 
-    def search_contact(self, keyword):
-        """Пошук контакту за ключовим словом."""
-        results = [contact for contact in self.contacts if keyword.lower() in contact.name.lower()]
-        return results
 
     def search_contact(self, keyword):
-        results = [contact for contact in self.contacts if keyword.lower() in str(contact.name.value).lower()]
-
+        results = [contact for contact in self.contacts if keyword.lower() in str(contact.data.get('name', '')).lower()]
         if results:
             print(f"Результати пошуку для '{keyword}':")
             for result in results:
-                print(f"Name: {result.name}\nPhone: {result.phone_number}\n{'='*30}")
+                print(f"Name: {result.data.get('name', '')}\nPhone: {result.data.get('phone_number', '')}\n{'='*30}")
         else:
             print(f"Такого контакту з ім'ям '{keyword}' не існує.")
 
         return results
 
-    def add_contact_interactive(self):
-        name = self.get_valid_input("Введіть ім'я: ", Name(''))
-        address = input("Введіть адресу (формат: країна, місто, вулиця, дом): ")
-        phone_number = self.get_valid_input("Введіть номер телефону (10 цифр): ", Phone(''))
-        email = input("Введіть електронну пошту: ")
-        birthday = self.get_valid_input("Введіть день народження (формат: DD.MM.YYYY): ", Birthday(''))
-
-        contact = Contact(name, address, phone_number, email, birthday)
-        self.add_contact(contact)
-        print("Контакт додано!\n")
 
     def get_valid_input(self, prompt, field):
         while True:
@@ -147,12 +133,13 @@ class ContactBook:
         locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
 
         for contact in self.contacts:
-            name = contact.name.value
-            birthday = contact.birthday
-            if birthday is None or not birthday.is_valid():
+            name = contact.data.get('name', '')
+            birthday = contact.data.get('birthday', '')
+            
+            if birthday is None or not self.validate_birthday(birthday):
                 continue
 
-            birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+            birthday_date = datetime.strptime(birthday, '%d.%m.%Y').date()
             birthday_this_year = birthday_date.replace(year=today.year)
 
             if birthday_this_year < today:
@@ -170,3 +157,17 @@ class ContactBook:
         locale.setlocale(locale.LC_TIME, '')
 
         return matching_birthdays
+    
+    def save_to_disk(self, filename="address_book.pkl"):
+        contacts_data = [contact.data for contact in self.contacts]
+        with open(filename, "wb") as file:
+            pickle.dump(contacts_data, file)
+
+    def load_from_disk(self, filename="address_book.pkl"):
+        try:
+            with open(filename, "rb") as file:
+                contacts_data = pickle.load(file)
+                self.contacts = [Contact(**data) for data in contacts_data]
+        except FileNotFoundError:
+            # If the file is not found, create an empty list
+            self.contacts = []
