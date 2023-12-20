@@ -7,10 +7,12 @@ def display_menu():
     print("2. Пошук контакту")
     print("3. Показати всі контакти")
     print("4. Вивести контакти з днями народження через задану кількість днів")
-    print("0. Вийти")
+    print("0. Вийти та зберегди дані")
 
 def main():
     my_contact_book = ContactBook()
+
+    my_contact_book.load_from_disk()
 
     while True:
         display_menu()
@@ -24,7 +26,7 @@ def main():
             search_results = my_contact_book.search_contact(search_keyword)
             print(f"Результати пошуку для '{search_keyword}':")
             for result in search_results:
-                print(f"Name: {result.name}\nPhone: {result.phone_number}\n{'='*30}")
+                print(f"Name: {result.data['name']}\nPhone: {result.data['phone_number']}\n{'='*30}")
             print()
 
         elif choice == "3":
@@ -46,7 +48,9 @@ def main():
             print()
 
         elif choice == "0":
-            print("Дякую за використання бота. До побачення!")
+            my_contact_book.save_to_disk()
+            print("\n --Address book saved to disk.--  \n \n")
+            print("Дякую за використання бота. До побачення!\n\n\n")
             break
 
         else:
@@ -54,3 +58,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
