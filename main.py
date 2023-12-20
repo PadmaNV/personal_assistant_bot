@@ -1,5 +1,8 @@
 from Classes.ContactBook import ContactBook
+<<<<<<< Updated upstream
 from Classes.Contact import Contact
+=======
+>>>>>>> Stashed changes
 
 def display_menu():
     print("1. Додати контакт")
@@ -33,7 +36,18 @@ def main():
 
         elif choice == "4":
             days = int(input("Введіть кількість днів для перевірки днів народження: "))
+<<<<<<< Updated upstream
             my_contact_book.upcoming_birthdays(days)
+=======
+            matching_birthdays = my_contact_book.get_birthdays(days)
+
+            if matching_birthdays:
+                print("Контакти з днями народження протягом наступних днів:")
+                for birthday_info in matching_birthdays:
+                    print(birthday_info)
+            else:
+                print(f"Немає контактів з днями народження протягом наступних {days} днів.")
+>>>>>>> Stashed changes
             print()
 
         elif choice == "0":
@@ -44,7 +58,11 @@ def main():
             print("Невірний вибір. Спробуйте ще раз.\n")
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     main()
 
 
 
+=======
+    main()
+>>>>>>> Stashed changes
