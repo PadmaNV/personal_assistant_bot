@@ -2,6 +2,7 @@ from .custom_errors import WrongDataFormat, PhoneWasNotFound, WrongEmailFormat
 from collections import UserDict, UserList, defaultdict
 from datetime import datetime, timedelta
 import calendar
+import pickle
 import re
 
 class Note(UserDict):
@@ -202,7 +203,20 @@ class AddressBook(UserDict, Record):
             else:
                 return "No scheduled birthdays for the upcoming week"
     #Denys to do end
-            
+
+
+    def save_to_disk(self, filename="address_book.pkl"):
+        with open(filename, "wb") as file:
+            pickle.dump(self.data, file)
+
+    def load_from_disk(self, filename="address_book.pkl"):
+        try:
+            with open(filename, "rb") as file:
+                self.data = pickle.load(file)
+        except FileNotFoundError:
+            # If the file is not found, create an empty dictionary
+            self.data = {}
+        
     #to do Vitalii           
     def delete(self, name):
         self.data.pop(name)

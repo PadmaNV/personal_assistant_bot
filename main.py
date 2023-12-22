@@ -16,6 +16,8 @@ from models import *
 
 new_book = AddressBook()
 
+new_book.load_from_disk()
+
 #to do Denys
 def parse_input(user_input):   
     cmd, *args = user_input.split()
@@ -117,6 +119,8 @@ def main():
         #to do Vitalii exit/save  
         if command in ["close", "exit"]:            
             print("Good bye!")
+            new_book.save_to_disk()
+            print("Address book saved to disk.")
             break
         elif command == "hello":
             print("How can I help you?")
