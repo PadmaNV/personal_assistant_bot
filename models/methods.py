@@ -221,19 +221,19 @@ def show_all():
         console.print("No contacts available.")
         return
 
-    table = Table(title="All Contacts")
-    table.add_column("Name", justify="center", style="cyan", no_wrap=True)
-    table.add_column("Phone", justify="center", style="magenta", no_wrap=True)
-    table.add_column("Email", justify="center", style="yellow", no_wrap=True)
-    table.add_column("Birthday", justify="center", style="green", no_wrap=True)
-    table.add_column("Notes", justify="center", style="blue", no_wrap=True)
+    table = Table(title="Список усіх контактів")
+    table.add_column("Ім'я", justify="center", style="cyan", no_wrap=True)
+    table.add_column("Номер телефону", justify="center", style="magenta", no_wrap=True)
+    table.add_column("Мейл", justify="center", style="yellow", no_wrap=True)
+    table.add_column("День народження", justify="center", style="green", no_wrap=True)
+    table.add_column("Нотатки", justify="center", style="blue", no_wrap=True)
 
     for contact_name, contact in new_book.data.items():
         phones = ", ".join([phone.value for phone in getattr(contact, 'phones', [])])
-        emails = ", ".join([email.value for email in getattr(contact, 'email', [])])
+        emails = ", ".join([email.value for email in getattr(contact, 'emails', [])]) if hasattr(contact, 'emails') else ''
         birthday = getattr(contact, 'show_birthday', lambda: '')().strftime('%d.%m.%Y')
-        notes = getattr(contact, 'show_notes', lambda: '')()
-
-        table.add_row(contact_name, phones, emails, str(birthday), notes)
+        notes = getattr(contact, 'notes', '') 
+       
+        table.add_row(contact_name, phones, emails, str(birthday), str(notes))
 
     console.print(table)
