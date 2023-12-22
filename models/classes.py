@@ -40,21 +40,20 @@ class Notes(UserList):
         return result           
                 
 
-    def edit_note(self,note,new_text):
-        self.find_note()
-        self.data[note-1][note] = new_text  
+    def edit_note(self,note,new_text):        
+        self.data[int(note)-1][note] = new_text  
 
 
     def delete_note(self,note=None,all = False):
         if all == False:               
-            del self.data[note-1]
+            del self.data[int(note)-1]
         else:            
             while len(self.data)!=0:
                 self.data.pop(0)
         return f"The {'note' if all == False else 'Notes'} successfully deleted"        
         
     def add_tag(self,note,tags):
-        self.data[note-1].extend(tags)
+        self.data[int(note)-1].extend(tags)
 
     def __str__(self):
         return '; '.join(str(note) for note in self.data)
