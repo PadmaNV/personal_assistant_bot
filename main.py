@@ -3,6 +3,9 @@ from models import *
 from models.functions import Email
 from models.functions import Birthday
 from models.functions import Phone
+from models.functions import Notes
+import prompt_toolkit
+
 
 
 
@@ -27,7 +30,11 @@ def parse_input(user_input):
     cmd = cmd.strip().lower()
     return cmd, *args
    
-
+def all_contacts():
+    if len(new_book) ==0:
+        return "Жодного контакту ще не було додано"
+    for record in new_book.data.values():
+        return record
 
 #to do Polina
 #add all parametrs to find
@@ -41,10 +48,10 @@ def find_contact(name):
 #need to validate exist number or not
 @input_error
 def add_contact(args):
-    name = input("Enter name: ")
+    name = input("Ім'я контакту: ")
 
     while True:
-        phone = input("Enter phone: ")
+        phone = input("Номер телефону: ")
         if phone.isnumeric() and len(phone) == 10:
             break
         else:
@@ -52,14 +59,21 @@ def add_contact(args):
 
     while True:
         try:
-            email = Email(input("Enter email: "))
+            email = Email(input("E-mail: "))
             break
         except WrongEmailFormat as e:
             print(f"Error: {e}")
 
     while True:
         try:
-            birthday = Birthday(input("Enter birthday (DD.MM.YYYY): "))
+            birthday = Birthday(input("Дата народження (DD.MM.YYYY): "))
+            break
+        except BirthdayFormat as e:
+            print(f"Error: {e}")
+    
+    while True:
+        try:
+            notes = input("Вкажить які саме нотатки бажаєте додати: ")                
             break
         except BirthdayFormat as e:
             print(f"Error: {e}")
@@ -69,13 +83,15 @@ def add_contact(args):
         contact.add_phone(phone)
         contact.add_email(email.value)
         contact.add_birthday(birthday.value)
+        contact.add_notes(notes)
         return f"The new phone number, email, and birthday for the contact {name} successfully added."
     else:
         new_contact = Record(name)
         new_contact.add_phone(phone)
         new_contact.add_email(email.value)
         new_contact.add_birthday(birthday.value)
-        new_book.add_record(new_contact)
+        new_contact.add_notes(notes)
+        new_book.add_record(new_contact)        
         return f"Contact {name} successfully added."
 
 
@@ -160,6 +176,11 @@ def change_contact(args):
         print("Invalid choice. Please enter a valid option number.")
 
     return ""
+@input_error
+def add_notes(contact_name,new_notes):
+    Record.add_notes(contact_name,new_notes)
+
+
 
 
 @input_error
@@ -223,13 +244,14 @@ def print_options():
     print("5. Показати всі збережені контакти")
     print("6. Дні народження")
     print("7. Удалити контакт")
-    print("8. Хочешь вийти?Тицяй 8")
+    print("0. Хочешь вийти? Тицяй 0")
 
 def change_contact_menu():
     print("Change contact options:")
-    print("1. Edit phone number")
-    print("2. Edit email")
-    print("3. Edit birthday")
+    print("1. Додати/редагувати номер телефону")
+    print("2. Редагувати E-mail")
+    print("3. Редагувати день народження")
+    print("0. Повернутися до головного меню")
 
 def main():
     print("Зроблю що захочешь")
@@ -247,18 +269,23 @@ def main():
 
         elif user_input == "2":
             print("Ти вибрав: Обновити контакт")
+            print(all_contacts())
             name_to_edit = input("Enter the name of the contact to edit: ")
             change_contact([name_to_edit])
             change_contact_menu()
-        elif user_input == "3":
-            print("")
+        elif user_input == "3": 
+            print(all_contacts())       
+            contact_name = input("Оберить ім'я контакту із списку вишче: ")
+            found_contact =  find_contact(contact_name)
+            new_notes = input("Вкажить які саме нотатки бажаєте додати: ")
+            add_notes(found_contact,new_notes)
             # Тут виклик функціі, яка додає примітки до контакту
         elif user_input == "4":
             print("")
             # Тут виклик функціі, яка знаходить контакт
-        elif user_input == "5":
-            print("")
+        elif user_input == "5":            
             # Тут виклик функціі, яка виводить всі контакти
+            print(all_contacts())
         elif user_input == "6":
             print("")
             # Тут виклик функціі, яка показує дні народження
