@@ -5,6 +5,7 @@ import calendar
 import re
 import locale
 
+#Aleksey to do start
 class Note(UserDict):
     def __init__(self):
         super().__init__()
@@ -13,10 +14,11 @@ class Note(UserDict):
     def __str__(self):
         return ', '.join(f'{key}: {value}' for key, value in self.data.items())    
 
-#Aleksey to do start
+
 class Notes(UserList):
     def __init__(self):
-        super().__init__()        
+        super().__init__()       
+
 
 
     def add_note(self, notes):
@@ -55,8 +57,8 @@ class Notes(UserList):
         self.data[note-1].extend(tags)
 
     def __str__(self):
-        return '\n'.join(str(note) for note in self.data)
-#Aleksey to end
+        return '; '.join(str(note) for note in self.data)
+#Aleksey to do end
 
 class Field:
     def __init__(self, value):
@@ -109,11 +111,13 @@ class Email:
 
 
 class Record:
-    def __init__(self, name, birthday=None):
+    def __init__(self, name):
         self.name = Name(name)
         self.phones = []
-        self.birthday = birthday
-        self.email = []
+        self.birthday = None
+        self.emails = []
+        self.notes = Notes()
+       
 
     def check_phone_exist(self, phone):
         phone_record = [record for record in self.phones if record.value == phone]
@@ -126,10 +130,12 @@ class Record:
         self.phones.append(Phone(phone))
         return True
         
+    def add_notes(self,notes):
+        self.notes.add_note(notes)
 
 
     def add_email(self, email):
-        self.email.append(Email(email))
+        self.emails.append(Email(email))
         return True
 
     def add_birthday(self, birthday):
@@ -157,7 +163,7 @@ class Record:
         return len(to_remove)
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        return f"Ім'я контакту: {self.name.value}, Телефони: {'; '.join(p.value for p in self.phones)}, День народження: {self.birthday.value}, E-mail: {'; '.join(e.value for e in self.emails)}, Нотатки: {self.notes}"
 
 
 class AddressBook(UserDict, Record):
@@ -167,7 +173,7 @@ class AddressBook(UserDict, Record):
     #to do Polina
     #add all parametrs to find
     def find(self, name):
-        #don't touch start
+        
         
         #don't touch start
         try:
