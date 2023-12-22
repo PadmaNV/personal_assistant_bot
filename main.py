@@ -4,7 +4,9 @@ from models.functions import Email
 from models.functions import Birthday
 from models.functions import Phone
 from models.functions import Notes
-import prompt_toolkit
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+
 
 
 
@@ -24,6 +26,12 @@ import prompt_toolkit
 
 new_book = AddressBook()
 
+def collect_contacts():
+    contacts = []
+    for key in new_book.keys():
+        contacts.append(key)
+    return contacts
+
 #to do Denys
 def parse_input(user_input):   
     cmd, *args = user_input.split()
@@ -32,7 +40,7 @@ def parse_input(user_input):
    
 def all_contacts():
     if len(new_book) ==0:
-        return "Жодного контакту ще не було додано"
+        return False
     for record in new_book.data.values():
         return record
 
@@ -182,7 +190,6 @@ def add_notes(contact_name,new_notes):
 
 
 
-
 @input_error
 def add_birthday(args):
     try:
@@ -268,18 +275,26 @@ def main():
                 print(result)
 
         elif user_input == "2":
-            print("Ти вибрав: Обновити контакт")
-            print(all_contacts())
-            name_to_edit = input("Enter the name of the contact to edit: ")
-            change_contact([name_to_edit])
-            change_contact_menu()
+            if all_contacts():
+                print("Ти вибрав: Обновити контакт")
+                print(all_contacts())
+                contacts = collect_contacts()
+                name_to_edit = prompt("Оберить ім'я контакту із списку вишче: ", completer=WordCompleter(contacts))
+                change_contact([name_to_edit])
+                change_contact_menu()
+            else:
+                print("Жодного контакту ще не було додано")  
+
         elif user_input == "3": 
-            print(all_contacts())       
-            contact_name = input("Оберить ім'я контакту із списку вишче: ")
-            found_contact =  find_contact(contact_name)
-            new_notes = input("Вкажить які саме нотатки бажаєте додати: ")
-            add_notes(found_contact,new_notes)
-            # Тут виклик функціі, яка додає примітки до контакту
+            if all_contacts():
+                print(all_contacts())
+                contacts = collect_contacts()                
+                contact_name = prompt("Оберить ім'я контакту із списку вишче: ", completer=WordCompleter(contacts))
+                found_contact =  find_contact(contact_name)
+                new_notes = input("Вкажить які саме нотатки бажаєте додати: ")
+                add_notes(found_contact,new_notes)
+            else:
+                print("Жодного контакту ще не було додано")            
         elif user_input == "4":
             print("")
             # Тут виклик функціі, яка знаходить контакт
