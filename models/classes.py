@@ -183,6 +183,13 @@ class AddressBook(UserDict, Record):
             return False
         #don't touch end
 
+    def display_contact_info(self, name):
+        contact = self.find(name)
+        if contact:
+            return str(contact)
+        else:
+            return "Контакт не знайдено"
+
     #Denys to do start
     
     def get_birthdays(self, days_until_birthday):
