@@ -22,6 +22,10 @@ class PhoneWasNotFound(KeyError):
     pass
 
 
+class WrongPhoneFormat(KeyError):
+    pass
+
+
 
 class WrongEmailFormat(KeyError):
     pass
@@ -30,6 +34,8 @@ def input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except WrongPhoneFormat:
+            return "Give me phone please"
         except WrongEmailFormat:
             return "some shit"
         except BirthdayFormat:

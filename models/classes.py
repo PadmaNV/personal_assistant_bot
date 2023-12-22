@@ -1,10 +1,12 @@
-from .custom_errors import WrongDataFormat, PhoneWasNotFound, WrongEmailFormat
+from .custom_errors import WrongDataFormat, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
 from collections import UserDict, UserList, defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import calendar
 import pickle
 import re
+import locale
 
+#Aleksey to do start
 class Note(UserDict):
     def __init__(self):
         super().__init__()
@@ -13,10 +15,11 @@ class Note(UserDict):
     def __str__(self):
         return ', '.join(f'{key}: {value}' for key, value in self.data.items())    
 
-#Aleksey to do start
+
 class Notes(UserList):
     def __init__(self):
-        super().__init__()        
+        super().__init__()       
+
 
 
     def add_note(self, notes):
@@ -55,8 +58,8 @@ class Notes(UserList):
         self.data[note-1].extend(tags)
 
     def __str__(self):
-        return '\n'.join(str(note) for note in self.data)
-#Aleksey to end
+        return '; '.join(str(note) for note in self.data)
+#Aleksey to do end
 
 class Field:
     def __init__(self, value):
@@ -72,15 +75,29 @@ class Name(Field):
 
 class Birthday:
     def __init__(self, birthday):
+        self.value = self.parse_birthday(birthday)
+
+    def parse_birthday(self, birthday):
         date_format = "%d.%m.%Y"
-        try:
-            self.value = datetime.strptime(birthday, date_format).date()
-        except ValueError:
-            raise WrongDataFormat
+        while True:
+            try:
+                if isinstance(birthday, date):
+                    return birthday
+                else:
+                    return datetime.strptime(birthday, date_format).date()
+            except ValueError:
+                print("Invalid date format. Please enter the date in the format DD.MM.YYYY.")
+                birthday = input("Enter birthday (DD.MM.YYYY): ")
 
 
-class Phone(Field):
-    pass
+class Phone:
+    def __init__(self, phone):
+        if phone.isnumeric() and len(phone) == 10:
+            self.value = phone
+        else:
+            raise WrongPhoneFormat('Invalid phone format.')
+            
+            #print("Invalid phone number. Please enter a 10-digit numeric phone number.")
 
 
 class Email:      
@@ -89,17 +106,19 @@ class Email:
         if re.match(pattern, email):
             self.value = email
         else:
-            raise WrongEmailFormat('Invalid email format') 
+            raise WrongEmailFormat('Invalid email format. Email must be in the format xxx@xxx.xxx') 
 
         
 
 
 class Record:
-    def __init__(self, name, birthday=None):
+    def __init__(self, name):
         self.name = Name(name)
         self.phones = []
-        self.birthday = birthday
-        self.email = []
+        self.birthday = None
+        self.emails = []
+        self.notes = Notes()
+       
 
     def check_phone_exist(self, phone):
         phone_record = [record for record in self.phones if record.value == phone]
@@ -110,10 +129,14 @@ class Record:
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
+        return True
+        
+    def add_notes(self,notes):
+        self.notes.add_note(notes)
 
 
     def add_email(self, email):
-        self.email.append(Email(email))
+        self.emails.append(Email(email))
         return True
 
     def add_birthday(self, birthday):
@@ -136,12 +159,12 @@ class Record:
 
     def remove_phone(self, phone):
         to_remove = self.check_phone_exist(phone)
-        for phone in to_remove:
-            self.phones.remove(phone)
+        for phone_obj in to_remove:
+            self.phones.remove(phone_obj)
         return len(to_remove)
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        return f"Ім'я контакту: {self.name.value}, Телефони: {'; '.join(p.value for p in self.phones)}, День народження: {self.birthday.value}, E-mail: {'; '.join(e.value for e in self.emails)}, Нотатки: {self.notes}"
 
 
 class AddressBook(UserDict, Record):
@@ -151,7 +174,7 @@ class AddressBook(UserDict, Record):
     #to do Polina
     #add all parametrs to find
     def find(self, name):
-        #don't touch start
+        
         
         #don't touch start
         try:
@@ -161,47 +184,45 @@ class AddressBook(UserDict, Record):
         #don't touch end
 
     #Denys to do start
-    def get_birthdays_per_week(self):
-        def next_monday(birthday_this_year, delta_days):
-            for i in range(7 - delta_days):
-                if (birthday_this_year + timedelta(days=i)).weekday() == 0:
-                    return True
-                else:
-                    i += 1
+    
+    def get_birthdays(self, days_until_birthday):
+        matching_birthdays = []
+        today = datetime.today().date()
 
-        def append_users_birthday(birthday_weekday, name):
-            users_birthday[birthday_weekday].append(name)
-
-        weekend_days = [5, 6]
-        users_birthday = defaultdict(list)
-        users_birthday = {0: [], 1: [], 2: [], 3: [], 4: []}
-        today_date = datetime.today().date()
+        # Set locale for Ukrainian language
+        locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
 
         for key, value in self.data.items():
             name = key
-            if value.birthday is None:
+            birthday = value.birthday
+            if birthday is None or not birthday.is_valid():
                 continue
-            else:
-                birthday = value.birthday.value
-                birthday_this_year = (
-                    birthday.replace(year=today_date.year + 1)
-                    if birthday.replace(year=today_date.year) < today_date
-                    else birthday.replace(year=today_date.year)
-                )
-                delta_days = (birthday_this_year - today_date).days
-                if delta_days < 7:
-                    if birthday_this_year.weekday() in weekend_days and next_monday(
-                        birthday_this_year, delta_days
-                    ):
-                        append_users_birthday(0, name)
-                    elif birthday_this_year.weekday() not in weekend_days:
-                        append_users_birthday(birthday_this_year.weekday(), name)
 
-        for key, value in users_birthday.items():
-            if value:
-                return (f"{calendar.day_name[key]:<9}: {', '.join(value):<}")
-            else:
-                return "No scheduled birthdays for the upcoming week"
+            birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+            birthday_this_year = birthday_date.replace(year=today.year)
+
+            if birthday_this_year < today:
+                next_year = birthday_this_year.year + 1
+                birthday_this_year = birthday_this_year.replace(year=next_year)
+
+            delta_days = (birthday_this_year - today).days
+
+            if 0 <= delta_days <= days_until_birthday:
+                day_of_week = birthday_this_year.strftime("%A")
+                formatted_date = birthday_this_year.strftime("%d %b %Y").capitalize()
+                user_info = f"{name}: {day_of_week}, {formatted_date}"
+                matching_birthdays.append(user_info)
+
+        # Reset locale to default language
+        locale.setlocale(locale.LC_TIME, '')
+
+        return matching_birthdays
+
+
+# ... (other classes and functions)
+
+# Update the get_birthdays_per_week method in the main block to call the new get_birthdays method
+
     #Denys to do end
 
 

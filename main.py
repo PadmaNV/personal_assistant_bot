@@ -1,11 +1,12 @@
-from models.custom_errors import *
-from models import *
+from models.methods import *
+from prompt_toolkit import prompt,completion
+
 
 # 1.	Add Contact 
 # 2.	Edit/Update 
-#   	    update/add email
-# 	        update/add phone 
-#           update birthday
+#   	update/add email
+# 	    update/add phone 
+#       update birthday
 # 3.	Add Notes 
 # 4.	Find Contact +/- 
 # 5.	All Contact
@@ -14,7 +15,6 @@ from models import *
 # 8.	Exit/save to the file
 
 
-new_book = AddressBook()
 
 new_book.load_from_disk()
 
@@ -25,126 +25,66 @@ def parse_input(user_input):
     return cmd, *args
    
 
-
-#to do Polina
-#add all parametrs to find
-def find_contact(name):
-    found_contact = new_book.find(name)
-    if found_contact == False:
-        raise KeyError
-    else:
-        return found_contact
-
-#need to validate exist number or not
-@input_error
-def add_contact(args):
-    name, phone = args
-    if not phone.isnumeric():
-        raise PhoneContainsAlphaSymbols
-    if len(phone) != 10:
-        raise PhoneContainsTenSymbols
-
-    if new_book.find(name):
-        new_book.find(name).add_phone(phone)
-        return f"The new phone number to contact {name} successfully added."
-    else:
-        new_contact = Record(name)
-        new_contact.add_phone(phone)
-        new_book.add_record(new_contact)
-        return f"Contact {name} successfully added."
-
-
-@input_error
-def change_contact(args):
-    try:
-        name, phone, new_phone = args
-    except:
-        raise NewPhoneWasNotProvided
-
-    Record.edit_phone(find_contact(name), phone, new_phone)
-    return f"Contact {name} successfully updated."
-
-
-@input_error
-def add_birthday(args):
-    try:
-        name, birthday = args
-    except:
-        raise BirthdayFormat
-
-    if not Record.add_birthday(find_contact(name), birthday):
-        raise WrongDataFormat
-    return f"Birthday for the contact {name} successfully added."
-
-@input_error
-def add_email(args):
-    try:
-        name, email = args
-    except:
-        raise ValueError
-
-    if not Record.add_email(find_contact(name), email):
-        raise WrongEmailFormat
-    return f"Email for the contact {name} successfully added."
-
-@input_error
-def show_birthday(args):
-    name = args[0]
-
-    birthday = Record.show_birthday(find_contact(name))
-    return f"Contact {name} birthday: {birthday}"
-
-
-@input_error
-def show_phone(args):
-    name = args[0]
-    return find_contact(name)
-
-
-@input_error
-def show_all():
-    return new_book.data.items()
-
-#to do:
-#add help
-#add print all comands
-#rework commands to numbers
-#to do Denys
+def change_contact_menu():
+    print("Change contact options:")
+    print("1. Додати/редагувати номер телефону")
+    print("2. Редагувати E-mail")
+    print("3. Редагувати день народження")
+    print("4. Редагувати нотатки")
+    print("0. Повернутися до головного меню")
 
 def main():
-    print("Welcome to the assistant bot!")
+    print("Зроблю що захочешь")
     while True:
-        user_input = input("Enter a command: ")    
-        command, *args = parse_input(user_input)
-        #to do Vitalii exit/save  
-        if command in ["close", "exit"]:            
-            print("Good bye!")
-            new_book.save_to_disk()
-            print("Address book saved to disk.")
+#        print_options()
+        user_input = input("Введи номер команди: ")
+
+        if user_input == "1":
+            print("Ти вибрав: Добавити контакт")
+            result = add_contact(None)
+            if isinstance(result, Exception):
+                print(f"An error occurred: {result}")
+            else:
+                print(result)
+
+        elif user_input == "2":
+            if all_contacts():
+                print("Ти вибрав: Обновити контакт")
+                print(all_contacts())
+                contacts = collect_contacts()
+                name_to_edit = prompt("Оберить ім'я контакту із списку вишче: ", completer=completion.WordCompleter(contacts))
+                change_contact([name_to_edit])
+                change_contact_menu()
+            else:
+                print("Жодного контакту ще не було додано")  
+
+        elif user_input == "3": 
+            if all_contacts():
+                print(all_contacts())
+                contacts = collect_contacts()                
+                contact_name = prompt("Оберить ім'я контакту із списку вишче: ", completer=completion.WordCompleter(contacts))
+                found_contact =  find_contact(contact_name)
+                new_notes = input("Вкажить які саме нотатки бажаєте додати: ")
+                add_notes(found_contact,new_notes)
+            else:
+                print("Жодного контакту ще не було додано")            
+        elif user_input == "4":
+            print("")
+            # Тут виклик функціі, яка знаходить контакт
+        elif user_input == "5":            
+            # Тут виклик функціі, яка виводить всі контакти
+            print(all_contacts())
+        elif user_input == "6":
+            print("")
+            # Тут виклик функціі, яка показує дні народження
+        elif user_input == "7":
+            print("")
+            # Тут виклик функціі, яка видаляє контакт
+        elif user_input == "0":
+            print("Ну па-па!")
             break
-        elif command == "hello":
-            print("How can I help you?")
-        elif command == "add":
-            print(add_contact(args))
-        elif command == "change":
-            print(change_contact(args))
-        elif command == "phone":
-            print(show_phone(args))
-        elif command == "add-birthday":
-            print(add_birthday(args))
-        elif command == "add-email":
-            print(add_email(args))
-        elif command == "show-birthday":
-            print(show_birthday(args))
-        elif command == "birthdays":
-            print(new_book.get_birthdays_per_week())
-        #to do Artem start
-        elif command == "all":
-            for record in new_book.data.values():
-                print(record)
-        #to do Artem end
         else:
-            print("Invalid command.")
+            print("Invalid command number. Please enter a valid option.")
 
 
 if __name__ == "__main__":
