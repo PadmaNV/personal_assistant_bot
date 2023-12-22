@@ -25,6 +25,10 @@ class PhoneWasNotFound(KeyError):
 class WrongPhoneFormat(KeyError):
     pass
 
+class ContactNotFound(Exception):
+    def __init__(self, message="Contact not found."):
+        self.message = message
+        super().__init__(self.message)
 
 
 class WrongEmailFormat(KeyError):

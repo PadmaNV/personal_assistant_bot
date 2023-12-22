@@ -16,16 +16,14 @@ from prompt_toolkit import prompt,completion
 
 
 
-def print_options():
-    print("Привіт!:")
-    print("1. Добавити контакт")
-    print("2. Обновити контакт")
-    print("3. Добавити Notes")
-    print("4. Пошук контакта")
-    print("5. Показати всі збережені контакти")
-    print("6. Дні народження")
-    print("7. Удалити контакт")
-    print("0. Хочешь вийти? Тицяй 0")
+
+
+#to do Denys
+def parse_input(user_input):   
+    cmd, *args = user_input.split()
+    cmd = cmd.strip().lower()
+    return cmd, *args
+   
 
 def change_contact_menu():
     print("Change contact options:")
@@ -38,7 +36,7 @@ def change_contact_menu():
 def main():
     print("Зроблю що захочешь")
     while True:
-        print_options()
+#        print_options()
         user_input = input("Введи номер команди: ")
 
         if user_input == "1":
@@ -83,7 +81,10 @@ def main():
             print("")
             # Тут виклик функціі, яка видаляє контакт
         elif user_input == "0":
+            new_book.save_to_disk()
+            print("Address book saved to disk.")
             print("Ну па-па!")
+            
             break
         else:
             print("Invalid command number. Please enter a valid option.")

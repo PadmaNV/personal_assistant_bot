@@ -1,7 +1,8 @@
-from .custom_errors import WrongDataFormat, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
+from .custom_errors import ContactNotFound, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
 from collections import UserDict, UserList, defaultdict
 from datetime import datetime, timedelta, date
 import calendar
+import pickle
 import re
 import locale
 
@@ -223,9 +224,48 @@ class AddressBook(UserDict, Record):
 # Update the get_birthdays_per_week method in the main block to call the new get_birthdays method
 
     #Denys to do end
-            
+
+
+    def save_to_disk(self, filename="address_book.pkl"):
+        with open(filename, "wb") as file:
+            pickle.dump(self.data, file)
+
+    def load_from_disk(self, filename="address_book.pkl"):
+        try:
+            with open(filename, "rb") as file:
+                self.data = pickle.load(file)
+        except FileNotFoundError:
+            # If the file is not found, create an empty dictionary
+            self.data = {}
+        
     #to do Vitalii           
-    def delete(self, name):
-        self.data.pop(name)
+    def delete_contact(self, name):
+        if name in self.data:
+            contact = self.data.pop(name)
+            
+            # пов'язані значення (phones, birthday, email)
+            for phone in contact.phones:
+                phone_value = phone.value
+                for record in self.data.values():
+                    record.remove_phone(phone_value)
+            
+            if contact.birthday:
+                birthday_value = contact.birthday.value
+                for record in self.data.values():
+                    record.remove_birthday(birthday_value)
+            
+            for email in contact.email:
+                email_value = email.value
+                for record in self.data.values():
+                    record.remove_email(email_value)
+            
+            #метод delete_note у класі Notes
+            if hasattr(contact, 'notes'):
+                for note in contact.notes:
+                    self.delete_note(note)
+            
+            return f"Contact {name} and associated values successfully deleted."
+        else:
+            raise ContactNotFound(f"Contact {name} not found.")
 
 #to do Vitalii exit/save   

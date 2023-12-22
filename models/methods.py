@@ -1,7 +1,9 @@
 from models.custom_errors import *
 from models import *
+from main import change_contact_menu
 
 new_book = AddressBook()
+new_book.load_from_disk()
 
 def collect_contacts():
     contacts = []
