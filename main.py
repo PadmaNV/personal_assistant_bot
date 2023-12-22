@@ -69,6 +69,14 @@ def main():
             else:
                 print("Жодного контакту ще не було додано")            
         elif user_input == "4":
+            search_name = input("Введіть ім'я для пошуку: ")
+            found_contact = find_contact(search_name)
+            if found_contact:
+                print(f"Знайдено контакт: {found_contact}")
+            else:
+                print("Контакт не знайдено")
+
+
             print("")
             # Тут виклик функціі, яка знаходить контакт
         elif user_input == "5":            
