@@ -37,6 +37,9 @@ def change_contact_menu():
 
 def main():
     print("Зроблю що захочешь")
+
+    console = Console()
+
     while True:
         print_options()
         user_input = input("Введи номер команди: ")
@@ -75,7 +78,7 @@ def main():
             # Тут виклик функціі, яка знаходить контакт
         elif user_input == "5":            
             # Тут виклик функціі, яка виводить всі контакти
-            print(all_contacts())
+            show_all(console)
         elif user_input == "6":
             print("")
             # Тут виклик функціі, яка показує дні народження
