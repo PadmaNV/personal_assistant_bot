@@ -16,7 +16,7 @@ from prompt_toolkit import prompt,completion
 
 
 
-new_book.load_from_disk()
+
 
 #to do Denys
 def parse_input(user_input):   
@@ -81,7 +81,10 @@ def main():
             print("")
             # Тут виклик функціі, яка видаляє контакт
         elif user_input == "0":
+            new_book.save_to_disk()
+            print("Address book saved to disk.")
             print("Ну па-па!")
+            
             break
         else:
             print("Invalid command number. Please enter a valid option.")
