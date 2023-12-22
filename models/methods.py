@@ -217,23 +217,23 @@ def show_phone(args):
 def show_all():
     console = Console()
 
-    if not new_book:
-        console.print("Не знайдено контактів.")
-        return new_book.data.items()
+    if not new_book.data:
+        console.print("No contacts available.")
+        return
 
-    table = Table(title="Всі контакти")
-    table.add_column("Ім'я", justify="center", style="cyan", no_wrap=True)
-    table.add_column("Телефон", justify="center", style="magenta", no_wrap=True)
-    table.add_column("Мейл", justify="center", style="yellow", no_wrap=True)
-    table.add_column("День народження", justify="center", style="green", no_wrap=True)
-    table.add_column("Нотатки", justify="center", style="blue", no_wrap=True)
+    table = Table(title="All Contacts")
+    table.add_column("Name", justify="center", style="cyan", no_wrap=True)
+    table.add_column("Phone", justify="center", style="magenta", no_wrap=True)
+    table.add_column("Email", justify="center", style="yellow", no_wrap=True)
+    table.add_column("Birthday", justify="center", style="green", no_wrap=True)
+    table.add_column("Notes", justify="center", style="blue", no_wrap=True)
 
-    for contact_name, contact in new_book.data.time():
-        phones = ", ".join([phone.value for phone in contact.phones])
-        emails = ", ".join([email.value for email in contact.email])
-        birthday = contact.show_birthday()
-        notes = contact.show_notes()
+    for contact_name, contact in new_book.data.items():
+        phones = ", ".join([phone.value for phone in getattr(contact, 'phones', [])])
+        emails = ", ".join([email.value for email in getattr(contact, 'email', [])])
+        birthday = getattr(contact, 'show_birthday', lambda: '')().strftime('%d.%m.%Y')
+        notes = getattr(contact, 'show_notes', lambda: '')()
 
-        table.add_row(contact_name, phones, emails, birthday, notes)
+        table.add_row(contact_name, phones, emails, str(birthday), notes)
 
     console.print(table)
