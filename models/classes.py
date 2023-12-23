@@ -42,7 +42,7 @@ class Notes(UserList):
                 
 
     def edit_note(self,note,new_text):        
-        self.data[int(note)-1][note] = new_text  
+        self.data[int(note)-1][int(note)] = new_text  
 
 
     
