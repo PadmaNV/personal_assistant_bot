@@ -192,6 +192,7 @@ class AddressBook(UserDict, Record):
             for email in contact.emails:
                 if name_or_phone_or_email == email.value:
                     return contact
+        return False
          
     def display_contact_info(self, name_or_phone_or_email):
         contact = self.find(name_or_phone_or_email)
