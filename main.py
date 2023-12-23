@@ -29,11 +29,10 @@ def change_contact(name):
             print( f"Жодної нотатки до контакту {name.name.value} ще не було додано")
             return
         else:
-            try:
-                edit_note(name)                
+            try:                        
                 print(edit_note(name))
             except KeyError as e:
-                    print(e)  
+                print(e)  
                     
     elif choice == "5":
         if len(name.notes) == 0:
@@ -64,6 +63,15 @@ def main():
     while True:
         main_menu()
 
+<<<<<<< HEAD
+=======
+# def parse_input(user_input):   
+#     cmd, *args = user_input.split()
+#     cmd = cmd.strip().lower()
+#     return cmd, *args
+
+
+>>>>>>> dev
         user_input = input("Введи номер команди: ")
 
         if user_input == "1":
