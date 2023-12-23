@@ -69,7 +69,7 @@ def main():
             else:
                 print("Жодного контакту ще не було додано")            
         elif user_input == "4":
-            search_name = input("Введіть ім'я для пошуку: ")
+            search_name = input("Введіть ім'я для пошуку, номер телефону або електронну адресу: ")
             found_contact = find_contact(search_name)
             if found_contact:
                 print(f"Знайдено контакт: {found_contact}")
