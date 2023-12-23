@@ -25,7 +25,7 @@ def all_contacts():
         return record
 
 #to do Polina
-#add all parametrs to find
+#add all parametrs to findd
 def find_contact(name):
     found_contact = new_book.find(name)
     if found_contact == False:
