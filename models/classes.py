@@ -234,6 +234,24 @@ class AddressBook(UserDict, Record):
         except:
             return False
         #don't touch end
+    def find(self, name_or_phone_or_email):
+        for contact in self.data.values():
+            if name_or_phone_or_email == contact.name.value:
+                return contact
+            for phone in contact.phones:
+                if name_or_phone_or_email == phone.value:
+                    return contact
+            for email in contact.emails:
+                if name_or_phone_or_email == email.value:
+                    return contact
+        return False
+         
+    def display_contact_info(self, name_or_phone_or_email):
+        contact = self.find(name_or_phone_or_email)
+        if contact:
+            return str(contact)
+        else:
+            return "Контакт не знайдено"
 
     #Denys to do start
     
