@@ -1,4 +1,6 @@
 from models.methods import *
+from models.contact_operations import delete_contact
+from prompt_toolkit import prompt, completion
 
 def change_contact_menu():
     print("Change contact options:")
@@ -11,6 +13,7 @@ def change_contact_menu():
 
 def change_contact(name):
     #name = name[0]    
+
 
     change_contact_menu()
     choice = input("Оберить що саме хочете змінити: ")
@@ -59,6 +62,13 @@ def main():
     print("Зроблю що захочешь")
     while True:
         main_menu()
+
+def parse_input(user_input):   
+    cmd, *args = user_input.split()
+    cmd = cmd.strip().lower()
+    return cmd, *args
+
+
         user_input = input("Введи номер команди: ")
 
         if user_input == "1":
@@ -85,6 +95,7 @@ def main():
             else:
                 print("Жодного контакту ще не було додано")            
         elif user_input == "4":
+            contact_name = input("Введіть ім'я контакту для видалення: ")
             print("")
             # Тут виклик функціі, яка знаходить контакт
         elif user_input == "5":            
@@ -95,9 +106,19 @@ def main():
             # Тут виклик функціі, яка показує дні народження
         elif user_input == "7":
             print("")
+            contact_name = input("Введіть ім'я контакту для видалення: ")
+            try:
+                result = delete_contact(new_book, contact_name)
+                print(result)
+            except ContactNotFound as e:
+                print(f"An error occurred: {e}")
+                
             # Тут виклик функціі, яка видаляє контакт
         elif user_input == "0":
+            new_book.save_to_disk()
+            print("Address book saved to disk.")
             print("Ну па-па!")
+            
             break
         else:
             print("Invalid command number. Please enter a valid option.")
