@@ -41,10 +41,11 @@ class Notes(UserList):
         return result           
                 
 
-    def edit_note(self,note,new_text):
-        self.find_note()
-        self.data[note-1][note] = new_text  
+    def edit_note(self,note,new_text):        
+        self.data[int(note)-1][note] = new_text  
 
+
+    
 
     def delete_note(self, note=None, all_notes=False):
         if all_notes:
@@ -59,9 +60,10 @@ class Notes(UserList):
                 return f"Note {note} not found."
         else:
             return "Note or index not provided."        
+
         
     def add_tag(self,note,tags):
-        self.data[note-1].extend(tags)
+        self.data[int(note)-1].extend(tags)
 
     def __str__(self):
         return '; '.join(str(note) for note in self.data)
