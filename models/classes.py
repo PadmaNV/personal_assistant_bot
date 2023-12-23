@@ -1,7 +1,8 @@
-from .custom_errors import WrongDataFormat, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
+from .custom_errors import ContactNotFound, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
 from collections import UserDict, UserList, defaultdict
 from datetime import datetime, timedelta, date
 import calendar
+import pickle
 import re
 import locale
 
@@ -40,21 +41,29 @@ class Notes(UserList):
         return result           
                 
 
-    def edit_note(self,note,new_text):
-        self.find_note()
-        self.data[note-1][note] = new_text  
+    def edit_note(self,note,new_text):        
+        self.data[int(note)-1][note] = new_text  
 
 
-    def delete_note(self,note=None,all = False):
-        if all == False:               
-            del self.data[note-1]
-        else:            
-            while len(self.data)!=0:
-                self.data.pop(0)
-        return f"The {'note' if all == False else 'Notes'} successfully deleted"        
+    
+
+    def delete_note(self, note=None, all_notes=False):
+        if all_notes:
+            self.data = []  # Очистимо весь список нотаток
+            return f"All notes successfully deleted."
+
+        if note is not None:
+            try:
+                self.data.remove(note)  # Видалимо нотатку
+                return f"Note {note} successfully deleted."
+            except ValueError:
+                return f"Note {note} not found."
+        else:
+            return "Note or index not provided."        
+
         
     def add_tag(self,note,tags):
-        self.data[note-1].extend(tags)
+        self.data[int(note)-1].extend(tags)
 
     def __str__(self):
         return '; '.join(str(note) for note in self.data)
@@ -161,6 +170,50 @@ class Record:
         for phone_obj in to_remove:
             self.phones.remove(phone_obj)
         return len(to_remove)
+    
+    def remove_phone(self, phone):
+        to_remove = self.check_phone_exist(phone)
+        if to_remove:
+            for phone_obj in to_remove:
+                self.phones.remove(phone_obj)
+            return len(to_remove)
+        else:
+            raise PhoneWasNotFound(f"Phone {phone} not found in the record.")
+    
+    def remove_contact_data(self, contact):
+        # Пов'язані значення (phones, birthday, email, notes)
+        for phone in contact.phones:
+            phone_value = phone.value
+            self.remove_phone(phone_value)
+
+        if contact.birthday:
+            birthday_value = contact.birthday.value
+            self.remove_birthday(birthday_value)
+
+        for email in contact.emails:
+            email_value = email.value
+            self.remove_email(email_value)
+
+        if hasattr(contact, 'notes'):
+            for note in contact.notes:
+                self.notes.delete_note(note)
+
+    def remove_birthday(self, birthday_value):
+        if self.birthday and self.birthday.value == birthday_value:
+            self.birthday = None
+            return 1 
+        else:
+            return 0
+
+    def remove_email(self, email):
+        for email_obj in self.emails:
+            if email_obj.value == email:
+                self.emails.remove(email_obj)
+
+    def remove_phone(self, phone):
+        phone_record = [record for record in self.phones if record.value == phone]
+        for phone_obj in phone_record:
+            self.phones.remove(phone_obj)
 
     def __str__(self):
         return f"Ім'я контакту: {self.name.value}, Телефони: {'; '.join(p.value for p in self.phones)}, День народження: {self.birthday.value}, E-mail: {'; '.join(e.value for e in self.emails)}, Нотатки: {self.notes}"
@@ -223,9 +276,23 @@ class AddressBook(UserDict, Record):
 # Update the get_birthdays_per_week method in the main block to call the new get_birthdays method
 
     #Denys to do end
-            
-    #to do Vitalii           
-    def delete(self, name):
-        self.data.pop(name)
 
-#to do Vitalii exit/save   
+
+    def save_to_disk(self, filename="address_book.pkl"):
+        with open(filename, "wb") as file:
+            pickle.dump(self.data, file)
+
+    def load_from_disk(self, filename="address_book.pkl"):
+        try:
+            with open(filename, "rb") as file:
+                self.data = pickle.load(file)
+        except FileNotFoundError:
+            # If the file is not found, create an empty dictionary
+            self.data = {}
+
+    def delete_note(self, note):
+        for record in self.data.values():
+            if hasattr(record, 'notes'):
+                record.notes.delete_note(note)
+        
+   
