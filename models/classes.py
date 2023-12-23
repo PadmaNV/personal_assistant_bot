@@ -225,29 +225,32 @@ class AddressBook(UserDict, Record):
 
     #to do Polina
     #add all parametrs to find
-    def find(self, name):
+    def find(self, name_or_phone_or_email):
         
         
         #don't touch start
         try:
-            return self.data[name]
+            return self.data[name_or_phone_or_email]
         except:
             return False
         #don't touch end
-    def find(self, name_or_phone_or_email):
+    def find(self, name_or_phone_or_email_or_note):
         for contact in self.data.values():
-            if name_or_phone_or_email == contact.name.value:
+            if name_or_phone_or_email_or_note == contact.name.value:
                 return contact
             for phone in contact.phones:
-                if name_or_phone_or_email == phone.value:
+                if name_or_phone_or_email_or_note == phone.value:
                     return contact
             for email in contact.emails:
-                if name_or_phone_or_email == email.value:
+                if name_or_phone_or_email_or_note == email.value:
+                    return contact
+            for note in contact.notes:
+                if name_or_phone_or_email_or_note in str(note):
                     return contact
         return False
          
-    def display_contact_info(self, name_or_phone_or_email):
-        contact = self.find(name_or_phone_or_email)
+    def display_contact_info(self, name_or_phone_or_email_or_note):
+        contact = self.find(name_or_phone_or_email_or_note)
         if contact:
             return str(contact)
         else:

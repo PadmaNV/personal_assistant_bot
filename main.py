@@ -59,15 +59,19 @@ def main_menu():
 
 def main():
     print("Зроблю що захочешь")
+
     while True:
         main_menu()
 
+<<<<<<< HEAD
+=======
 # def parse_input(user_input):   
 #     cmd, *args = user_input.split()
 #     cmd = cmd.strip().lower()
 #     return cmd, *args
 
 
+>>>>>>> dev
         user_input = input("Введи номер команди: ")
 
         if user_input == "1":
@@ -94,7 +98,7 @@ def main():
             else:
                 print("Жодного контакту ще не було додано")            
         elif user_input == "4":
-            search_name = input("Введіть ім'я для пошуку, номер телефону або електронну адресу: ")
+            search_name = input("Введіть ім'я для пошуку, номер телефону, електронну адресу або нотатки: ")
             found_contact = find_contact(search_name)
             if found_contact:
                 print(f"Знайдено контакт: {found_contact}")
