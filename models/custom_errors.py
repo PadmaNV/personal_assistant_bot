@@ -59,26 +59,26 @@ def input_error(func):
         try:
             return func(*args, **kwargs)
         except WrongPhoneFormat:
-            return "Give me phone please"
+            print("\033[91mGive me phone please\033[0m")
         except WrongEmailFormat:
-            return "some shit"
+            print("\033[91msome shit\033[0m")
         except BirthdayFormat:
-            return "Please be sure that provided format is applicable,\nformat for birthday adding: 'name' 'birthday'"
+            print("\033[91mPlease be sure that provided format is applicable,\nformat for birthday adding: 'name' 'birthday'\033[0m")
         except PhoneWasNotFound:
-            return "We cannot find this phone number, please try it again"
+            print("\033[91mWe cannot find this phone number, please try it again\033[0m")
         except NewPhoneWasNotProvided:
-            return "Please be sure that provided format is applicable,\nformat for phone changing: 'name' 'old phone number' 'new phone number'"
+            print("\033[91mPlease be sure that provided format is applicable,\nformat for phone changing: 'name' 'old phone number' 'new phone number'\033[0m")
         except WrongDataFormat:
-            return "Please be sure that provided format is applicable,\nallowed data format: DD.MM.YYYY"
+            print("\033[91mPlease be sure that provided format is applicable,\nallowed data format: DD.MM.YYYY\033[0m")
         except PhoneContainsTenSymbols:
-            return "Phone must contains strictly 10 numbers, please try it again."
+            print("\033[91mPhone must contain strictly 10 numbers, please try it again.\033[0m")
         except PhoneContainsAlphaSymbols:
-            return "Phone cannot contain letters, please try it again."
+            print("\033[91mPhone cannot contain letters, please try it again.\033[0m")
         except ValueError:
-            return "Give me name and phone please."
+            print("\033[91mGive me name and phone please.\033[0m")
         except KeyError:
-            return "Sorry, we couldn't find the contact. Please check the name and try again."
+            print("\033[91mSorry, we couldn't find the contact. Please check the name and try again.\033[0m")
         except IndexError:
-            return "Contact name cannot be empty, please and try again."
+            print("\033[91mContact name cannot be empty, please try again.\033[0m")
 
     return inner

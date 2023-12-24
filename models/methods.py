@@ -1,3 +1,7 @@
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import print_formatted_text
+from prompt_toolkit.formatted_text import HTML
 from rich import print
 from rich.console import Console
 from rich.table import Table
@@ -34,7 +38,7 @@ def all_contacts():
 def find_contact(name):
     found_contact = new_book.find(name)
     if found_contact == False:
-        raise KeyError('Need to rework')
+        raise KeyError()
     else:
         return found_contact
 
@@ -157,7 +161,7 @@ def validate_contact():
     contacts = collect_contacts()
     name_to_edit = prompt("Оберить ім'я контакту із списку вишче: ", completer=completion.WordCompleter(contacts))
     if name_to_edit not in contacts:
-        raise KeyError("[red]Ви ввели некоректне ім'я[/red]")
+        print("[red]Ви ввели некоректне ім'я[/red]")
     found_contact = find_contact(name_to_edit)
     return found_contact
 
@@ -171,7 +175,7 @@ def validate_note(name):
 def edit_note(name):    
     note_to_change = input("Обери номер нотатки яку треба змінити: ")
     if int(note_to_change) not in validate_note(name):
-        raise KeyError("[red]Ви ввели некоректний номер нотатки[/red]")
+        print("[red]Ви ввели некоректний номер нотатки[/red]")
     note_new_text = input("Вкажи новий текст нотатки: ")  
     name.notes.edit_note(note_to_change,note_new_text)
     return f"[green]Нотатки під номером [yellow bold]{note_to_change}[/yellow bold] успішно змінена[/green]"
@@ -182,7 +186,7 @@ def delete_note(name):
         name.notes.delete_note(all_notes=True)
         return "[green]Усі нотатки успішно видалені[/green]"
     elif int(note_to_delete) not in validate_note(name):      
-        raise KeyError("[red]Ви ввели некоректний номер нотатки[/red]")
+        print("[red]Ви ввели некоректний номер нотатки[/red]")
     else:
         name.notes.delete_note(note=note_to_delete)    
         return f"[green]Нотатка [yellow bold]№{note_to_delete}[/yellow bold] успішно видалена[/green]"
