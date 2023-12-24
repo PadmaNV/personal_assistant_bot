@@ -1,3 +1,6 @@
+from rich.console import Console
+from rich.table import Table
+from models.custom_errors import *
 from models import *
 from models.custom_errors import *
 from prompt_toolkit import prompt,completion
@@ -26,7 +29,7 @@ def all_contacts():
         return record
 
 #to do Polina
-#add all parametrs to find
+#add all parametrs to findd
 def find_contact(name):
     found_contact = new_book.find(name)
     if found_contact == False:
@@ -234,4 +237,25 @@ def show_phone(args):
 
 @input_error
 def show_all():
-    return new_book.data.items()
+    console = Console()
+
+    if not new_book.data:
+        console.print("No contacts available.")
+        return
+
+    table = Table(title="Список усіх контактів")
+    table.add_column("Ім'я", justify="center", style="cyan", no_wrap=True)
+    table.add_column("Номер телефону", justify="center", style="magenta", no_wrap=True)
+    table.add_column("Мейл", justify="center", style="yellow", no_wrap=True)
+    table.add_column("День народження", justify="center", style="green", no_wrap=True)
+    table.add_column("Нотатки", justify="center", style="blue", no_wrap=True)
+
+    for contact_name, contact in new_book.data.items():
+        phones = ", ".join([phone.value for phone in getattr(contact, 'phones', [])])
+        emails = ", ".join([email.value for email in getattr(contact, 'emails', [])]) if hasattr(contact, 'emails') else ''
+        birthday = getattr(contact, 'show_birthday', lambda: '')().strftime('%d.%m.%Y')
+        notes = getattr(contact, 'notes', '') 
+       
+        table.add_row(contact_name, phones, emails, str(birthday), str(notes))
+
+    console.print(table)

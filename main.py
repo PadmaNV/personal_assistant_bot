@@ -3,13 +3,13 @@ from models.contact_operations import delete_contact
 from prompt_toolkit import prompt, completion
 
 def change_contact_menu():
-    print("Change contact options:")
-    print("1. Додати/редагувати номер телефону")
-    print("2. Редагувати E-mail")
-    print("3. Редагувати день народження")
-    print("4. Редагувати нотатки")
-    print("5. Видалити нотатки")
-    print("0. Повернутися до головного меню")
+    print("   Опції оновлення контакту:")
+    print("     1. Додати/редагувати номер телефону")
+    print("     2. Редагувати E-mail")
+    print("     3. Редагувати день народження")
+    print("     4. Редагувати нотатки")
+    print("     5. Видалити нотатки")
+    print("     0. Повернутися до головного меню")
 
 def change_contact(name):
     #name = name[0]    
@@ -52,13 +52,15 @@ def main_menu():
     print("2. Обновити контакт")
     print("3. Додати нотатки")
     print("4. Пошук контакта")
-    print("5. Показати всі збережені контакти")
+    print("5. Показати книгу контаків")
     print("6. Дні народження")
-    print("7. Видалити контакт")
+    print("9. Видалити контакт")
     print("0. Хочешь вийти? Тицяй 0")
 
 def main():
     print("Зроблю що захочешь")
+
+    console = Console()
 
     while True:
         main_menu()
@@ -102,11 +104,11 @@ def main():
             # Тут виклик функціі, яка знаходить контакт
         elif user_input == "5":            
             # Тут виклик функціі, яка виводить всі контакти
-            print(all_contacts())
+            show_all()
         elif user_input == "6":
             print("")
             # Тут виклик функціі, яка показує дні народження
-        elif user_input == "7":
+        elif user_input == "9":
             print("")
             contact_name = input("Введіть ім'я контакту для видалення: ")
             try:
@@ -115,7 +117,6 @@ def main():
             except ContactNotFound as e:
                 print(f"An error occurred: {e}")
                 
-            # Тут виклик функціі, яка видаляє контакт
         elif user_input == "0":
             new_book.save_to_disk()
             print("Address book saved to disk.")
