@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 from rich.console import Console
 from rich.table import Table
-
 from models.custom_errors import *
-=======
->>>>>>> dev
 from models import *
 from models.custom_errors import *
 from prompt_toolkit import prompt,completion
