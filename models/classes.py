@@ -41,29 +41,21 @@ class Notes(UserList):
         return result           
                 
 
-    def edit_note(self,note,new_text):        
-        self.data[int(note)-1][int(note)] = new_text  
+    def edit_note(self,note,new_text):
+        self.find_note()
+        self.data[note-1][note] = new_text  
 
 
-    
-
-    def delete_note(self, note=None, all_notes=False):
-        if all_notes:
-            self.data = []  # Очистимо весь список нотаток
-            return f"All notes successfully deleted."
-
-        if note is not None:
-            try:
-                self.data.remove(note)  # Видалимо нотатку
-                return f"Note {note} successfully deleted."
-            except ValueError:
-                return f"Note {note} not found."
-        else:
-            return "Note or index not provided."        
-
+    def delete_note(self,note=None,all = False):
+        if all == False:               
+            del self.data[note-1]
+        else:            
+            while len(self.data)!=0:
+                self.data.pop(0)
+        return f"The {'note' if all == False else 'Notes'} successfully deleted"        
         
     def add_tag(self,note,tags):
-        self.data[int(note)-1].extend(tags)
+        self.data[note-1].extend(tags)
 
     def __str__(self):
         return '; '.join(str(note) for note in self.data)
@@ -136,8 +128,14 @@ class Record:
             raise PhoneWasNotFound
 
     def add_phone(self, phone):
-        self.phones.append(Phone(phone))
-        return True
+        new_phone = Phone(phone)
+        
+        if new_phone not in self.phones:
+            self.phones.append(new_phone)
+            return True
+        else:
+            print("Цей номер телефону вже існує для цього контакту.")
+            return False
         
     def add_notes(self,notes):
         self.notes.add_note(notes)
@@ -170,50 +168,6 @@ class Record:
         for phone_obj in to_remove:
             self.phones.remove(phone_obj)
         return len(to_remove)
-    
-    def remove_phone(self, phone):
-        to_remove = self.check_phone_exist(phone)
-        if to_remove:
-            for phone_obj in to_remove:
-                self.phones.remove(phone_obj)
-            return len(to_remove)
-        else:
-            raise PhoneWasNotFound(f"Phone {phone} not found in the record.")
-    
-    def remove_contact_data(self, contact):
-        # Пов'язані значення (phones, birthday, email, notes)
-        for phone in contact.phones:
-            phone_value = phone.value
-            self.remove_phone(phone_value)
-
-        if contact.birthday:
-            birthday_value = contact.birthday.value
-            self.remove_birthday(birthday_value)
-
-        for email in contact.emails:
-            email_value = email.value
-            self.remove_email(email_value)
-
-        if hasattr(contact, 'notes'):
-            for note in contact.notes:
-                self.notes.delete_note(note)
-
-    def remove_birthday(self, birthday_value):
-        if self.birthday and self.birthday.value == birthday_value:
-            self.birthday = None
-            return 1 
-        else:
-            return 0
-
-    def remove_email(self, email):
-        for email_obj in self.emails:
-            if email_obj.value == email:
-                self.emails.remove(email_obj)
-
-    def remove_phone(self, phone):
-        phone_record = [record for record in self.phones if record.value == phone]
-        for phone_obj in phone_record:
-            self.phones.remove(phone_obj)
 
     def __str__(self):
         return f"Ім'я контакту: {self.name.value}, Телефони: {'; '.join(p.value for p in self.phones)}, День народження: {self.birthday.value}, E-mail: {'; '.join(e.value for e in self.emails)}, Нотатки: {self.notes}"
@@ -225,32 +179,29 @@ class AddressBook(UserDict, Record):
 
     #to do Polina
     #add all parametrs to find
-    def find(self, name_or_phone_or_email):
+    def find(self, name):
         
         
         #don't touch start
         try:
-            return self.data[name_or_phone_or_email]
+            return self.data[name]
         except:
             return False
         #don't touch end
-    def find(self, name_or_phone_or_email_or_note):
+    def find(self, name_or_phone_or_email):
         for contact in self.data.values():
-            if name_or_phone_or_email_or_note == contact.name.value:
+            if name_or_phone_or_email == contact.name.value:
                 return contact
             for phone in contact.phones:
-                if name_or_phone_or_email_or_note == phone.value:
+                if name_or_phone_or_email == phone.value:
                     return contact
             for email in contact.emails:
-                if name_or_phone_or_email_or_note == email.value:
-                    return contact
-            for note in contact.notes:
-                if name_or_phone_or_email_or_note in str(note):
+                if name_or_phone_or_email == email.value:
                     return contact
         return False
          
-    def display_contact_info(self, name_or_phone_or_email_or_note):
-        contact = self.find(name_or_phone_or_email_or_note)
+    def display_contact_info(self, name_or_phone_or_email):
+        contact = self.find(name_or_phone_or_email)
         if contact:
             return str(contact)
         else:
@@ -262,16 +213,17 @@ class AddressBook(UserDict, Record):
         matching_birthdays = []
         today = datetime.today().date()
 
-        # Set locale for Ukrainian language
-        locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
-
         for key, value in self.data.items():
             name = key
             birthday = value.birthday
-            if birthday is None or not birthday.is_valid():
+            if birthday is None:
                 continue
 
-            birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+            if isinstance(birthday.value, date):
+                birthday_date = birthday.value
+            else:
+                birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+
             birthday_this_year = birthday_date.replace(year=today.year)
 
             if birthday_this_year < today:
@@ -286,13 +238,8 @@ class AddressBook(UserDict, Record):
                 user_info = f"{name}: {day_of_week}, {formatted_date}"
                 matching_birthdays.append(user_info)
 
-        # Reset locale to default language
-        locale.setlocale(locale.LC_TIME, '')
-
         return matching_birthdays
 
-
-# ... (other classes and functions)
 
 # Update the get_birthdays_per_week method in the main block to call the new get_birthdays method
 
@@ -310,10 +257,96 @@ class AddressBook(UserDict, Record):
         except FileNotFoundError:
             # If the file is not found, create an empty dictionary
             self.data = {}
-
-    def delete_note(self, note):
-        for record in self.data.values():
-            if hasattr(record, 'notes'):
-                record.notes.delete_note(note)
         
-   
+    #to do Vitalii           
+    def delete_contact(self, name):
+        if name in self.data:
+            contact = self.data.pop(name)
+            
+            # пов'язані значення (phones, birthday, email)
+            for phone in contact.phones:
+                phone_value = phone.value
+                for record in self.data.values():
+                    record.remove_phone(phone_value)
+            
+            if contact.birthday:
+                birthday_value = contact.birthday.value
+                for record in self.data.values():
+                    record.remove_birthday(birthday_value)
+            
+            for email in contact.email:
+                email_value = email.value
+                for record in self.data.values():
+                    record.remove_email(email_value)
+            
+            #метод delete_note у класі Notes
+            if hasattr(contact, 'notes'):
+                for note in contact.notes:
+                    self.delete_note(note)
+            
+            return f"Contact {name} and associated values successfully deleted."
+        else:
+            raise ContactNotFound(f"Contact {name} not found.")
+
+#to do Vitalii exit/save  
+
+    def add_phone_menu(self, name):
+        current_contact = self.find(name)
+        print(f"Current phone numbers for {name}:")
+        for i, phone in enumerate(current_contact.phones, 1):
+            print(f"{i}. {phone.value}")
+
+        print("0. Додати новий номер телефону")
+
+        while True:
+            try:
+                choice = int(input("Виберіть номер телефону для редагування (або 0, щоб повернутися): "))
+                if 0 <= choice <= len(current_contact.phones):
+                    break
+                else:
+                    print("Невірний вибір. Будь ласка, введіть правильний номер.")
+            except ValueError:
+                print("Невірний ввід. Будь ласка, введіть номер.")
+
+        if choice == 0:
+            new_phone = input("Введіть новий номер телефону: ")
+            current_contact.add_phone(new_phone)
+            print("Новий номер телефону успішно доданий.")
+        else:
+            new_phone = input("Введіть новий номер телефону: ")
+            current_contact.phones[choice - 1] = Phone(new_phone)
+            print("Номер телефону успішно оновлено.") 
+
+
+    def edit_email(self,name):
+        current_contact = self.find(name)
+        print("Існуючі електронні адреси:")
+        for i, email in enumerate(current_contact.emails, 1):
+            print(f"{i}. {email.value}")
+
+        while True:
+            try:
+                email_choice = int(input("Виберіть номер електронної адреси для редагування (або 0, щоб додати нову): "))
+                if 0 <= email_choice <= len(current_contact.emails):
+                    break
+                else:
+                    print("Невірний вибір. Будь ласка, введіть правильний номер.")
+            except ValueError:
+                print("Невірний ввід. Будь ласка, введіть номер.")
+
+        if email_choice == 0:
+            # Додаємо новий email
+            new_email = input("Введіть новий електронний адрес: ")
+            try:
+                current_contact.add_email(new_email)
+                print("Електронний адреса успішно додана.")
+            except WrongEmailFormat:
+                print("Невірний формат електронної адреси. Будь ласка, введіть правильний email.")
+        else:
+            # Редагуємо існуючий email
+            new_email = input("Введіть новий електронний адрес: ")
+            try:
+                current_contact.emails[email_choice - 1] = Email(new_email)
+                print("Електронний адреса успішно оновлена.")
+            except WrongEmailFormat:
+                print("Невірний формат електронної адреси. Будь ласка, введіть правильний email.")
