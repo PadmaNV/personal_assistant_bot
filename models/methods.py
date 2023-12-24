@@ -172,8 +172,9 @@ def edit_note(name):
     note_to_change = input("Обери номер нотатки яку треба змінити: ")
     if int(note_to_change) not in validate_note(name):
         raise KeyError("[red]Ви ввели некоректний номер нотатки[/red]")
+    note_to_change_obj = name.notes.find_note_by_key(note_to_change)
     note_new_text = input("Вкажи новий текст нотатки: ")  
-    name.notes.edit_note(note_to_change,note_new_text)
+    name.notes.edit_note(note_to_change_obj,note_to_change,note_new_text)
     return f"[green]Нотатки під номером [yellow bold]{note_to_change}[/yellow bold] успішно змінена[/green]"
 
 def delete_note(name):
@@ -184,7 +185,8 @@ def delete_note(name):
     elif int(note_to_delete) not in validate_note(name):      
         raise KeyError("[red]Ви ввели некоректний номер нотатки[/red]")
     else:
-        name.notes.delete_note(note=note_to_delete)    
+        note_to_delete = name.notes.find_note_by_key(note_to_delete)
+        name.notes.delete_note(note_to_delete)    
         return f"[green]Нотатка [yellow bold]№{note_to_delete}[/yellow bold] успішно видалена[/green]"
     
 @input_error
