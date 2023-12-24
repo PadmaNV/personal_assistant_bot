@@ -1,7 +1,8 @@
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from rich import print
 from models.methods import *
 from models.contact_operations import delete_contact
-from prompt_toolkit import prompt, completion
 
 def change_contact_menu():
     print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
@@ -14,7 +15,6 @@ def change_contact_menu():
     print("     0. Повернутися до головного меню")
 
 def change_contact(name):
-    #name = name[0]    
 
 
     change_contact_menu()
@@ -119,7 +119,21 @@ def main():
         elif user_input == "6":
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
             print("")
-            # Тут виклик функціі, яка показує дні народження
+
+            try:
+                days = int(input("Введіть кількість днів для перевірки днів народження: "))
+            except ValueError:
+                print("Невірний ввід. Будь ласка, введіть правильне число.")
+                continue
+
+            upcoming_birthdays = new_book.get_birthdays(days)
+            
+            if upcoming_birthdays:
+                print(f"Дні народження протягом наступних {days} днів:")
+                for birthday_info in upcoming_birthdays:
+                    print(birthday_info)
+            else:
+                print(f"Немає днів народження протягом наступних {days} днів.")
         elif user_input == "9":
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
             print("")
