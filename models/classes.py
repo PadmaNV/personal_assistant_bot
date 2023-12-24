@@ -279,16 +279,17 @@ class AddressBook(UserDict, Record):
         matching_birthdays = []
         today = datetime.today().date()
 
-        # Set locale for Ukrainian language
-        locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
-
         for key, value in self.data.items():
             name = key
             birthday = value.birthday
-            if birthday is None or not birthday.is_valid():
+            if birthday is None:
                 continue
 
-            birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+            if isinstance(birthday.value, date):
+                birthday_date = birthday.value
+            else:
+                birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+
             birthday_this_year = birthday_date.replace(year=today.year)
 
             if birthday_this_year < today:
@@ -302,9 +303,6 @@ class AddressBook(UserDict, Record):
                 formatted_date = birthday_this_year.strftime("%d %b %Y").capitalize()
                 user_info = f"{name}: {day_of_week}, {formatted_date}"
                 matching_birthdays.append(user_info)
-
-        # Reset locale to default language
-        locale.setlocale(locale.LC_TIME, '')
 
         return matching_birthdays
 
