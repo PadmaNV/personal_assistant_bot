@@ -1,3 +1,4 @@
+from rich import print
 from rich.console import Console
 from rich.table import Table
 from models.custom_errors import *
@@ -47,7 +48,7 @@ def add_contact(args):
         if phone.isnumeric() and len(phone) == 10:
             break
         else:
-            print("Invalid phone number. Please enter a 10-digit numeric phone number.")
+            print("[red]Invalid phone number. Please enter a [/red][bold yellow]10-digit numeric phone number.[/bold yellow]")
 
     while True:
         try:
@@ -61,14 +62,14 @@ def add_contact(args):
             birthday = Birthday(input("Дата народження (DD.MM.YYYY): "))
             break
         except BirthdayFormat as e:
-            print(f"Error: {e}")
+            print(f"[red]Error: [/red][yellow bold]{e}[/yellow bold]")
     
     while True:
         try:
             notes = input("Нотатки: ")                
             break
         except BirthdayFormat as e:
-            print(f"Error: {e}")
+            print(f"[red]Error: [/red][yellow bold]{e}[/yellow bold]")
 
     if  new_book.find(name):
         contact = new_book.find(name)
@@ -77,7 +78,7 @@ def add_contact(args):
         contact.add_birthday(birthday.value)
         if notes != "":
             contact.add_notes(notes)
-        return f"The new phone number, email, and birthday for the contact {name} successfully added."
+        return f"[green]The new phone number, email, and birthday for the contact [yellow bold]{name}[/yellow bold] successfully added.[/green]"
     else:        
         new_contact = Record(name)
         new_contact.add_phone(phone)
@@ -86,7 +87,7 @@ def add_contact(args):
         if notes != "":
             new_contact.add_notes(notes)        
         new_book.add_record(new_contact)        
-        return f"Contact {name} successfully added."
+        return f"[green]Contact [yellow bold]{name}[/yellow bold] successfully added.[/green]"
 
 def edit_phone(name):
     current_contact = find_contact(name)
@@ -100,16 +101,16 @@ def edit_phone(name):
             if 0 <= choice <= len(current_contact.phones):
                 break
             else:
-                print("Invalid choice. Please enter a valid number.")
+                print("[red]Invalid choice. Please enter a [bold]valid number.[/bold][/red]")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("[red]Invalid input. Please enter a [bold]number.[/bold][/red]")
 
     if choice == 0:
         return
 
     new_phone = input("Enter the new phone number: ")
     current_contact.phones[choice - 1] = Phone(new_phone)
-    print("Phone number successfully updated.")
+    print("[green]Phone number successfully updated.[green]")
 
 def edit_email(name):
     current_contact = find_contact(name)
@@ -123,9 +124,9 @@ def edit_email(name):
             if 0 <= choice <= len(current_contact.email):
                 break
             else:
-                print("Invalid choice. Please enter a valid number.")
+                print("[red]Invalid choice. Please enter a [bold]valid number.[/bold][/red]")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("[red]Invalid input. Please enter a number.[/red]")
 
     if choice == 0:
         return
@@ -133,30 +134,30 @@ def edit_email(name):
     new_email = input("Enter the new email address: ")
     try:
         current_contact.email[choice - 1] = Email(new_email)
-        print("Email address successfully updated.")
+        print("[green]Email address successfully updated.[/green]")
     except WrongEmailFormat:
-        print("Invalid email address. Please enter a valid email.")
+        print("[red]Invalid email address. Please enter a valid email.[/red]")
 
 def edit_birthday(name):
     current_contact = find_contact(name)
     current_birthday = current_contact.show_birthday()
-    print(f"Current birthday: {current_birthday}")
+    print(f"Current birthday: [yellow]{current_birthday}[/yellow]")
 
     while True:
         try:
             new_birthday_str = input("Enter the new birthday (DD.MM.YYYY): ")
             current_contact.add_birthday(Birthday(new_birthday_str).value)
-            print("Birthday successfully updated.")
+            print("[green]Birthday successfully updated.[/green]")
             break
         except WrongDataFormat:
-            print("Invalid date format. Please enter the date in the format DD.MM.YYYY.")
+            print("[red]Invalid date format. Please enter the date in the format [/red][yellow bold]DD.MM.YYYY.[/yellow bold]")
 
 def validate_contact():    
     show_all()
     contacts = collect_contacts()
     name_to_edit = prompt("Оберить ім'я контакту із списку вишче: ", completer=completion.WordCompleter(contacts))
     if name_to_edit not in contacts:
-        raise KeyError("Ви ввели некоректне ім'я")
+        raise KeyError("[red]Ви ввели некоректне ім'я[/red]")
     found_contact = find_contact(name_to_edit)
     return found_contact
 
@@ -170,28 +171,28 @@ def validate_note(name):
 def edit_note(name):    
     note_to_change = input("Обери номер нотатки яку треба змінити: ")
     if int(note_to_change) not in validate_note(name):
-        raise KeyError("Ви ввели некоректний номер нотатки")
+        raise KeyError("[red]Ви ввели некоректний номер нотатки[/red]")
     note_new_text = input("Вкажи новий текст нотатки: ")  
     name.notes.edit_note(note_to_change,note_new_text)
-    return f"Нотатки під номером {note_to_change} успішно змінена"
+    return f"[green]Нотатки під номером [yellow bold]{note_to_change}[/yellow bold] успішно змінена[/green]"
 
 def delete_note(name):
     note_to_delete = input("Обери номер нотатки яку треба видалити, для видалення усіх нотаток введить команду all: ")
     if note_to_delete == 'all':
         name.notes.delete_note(all_notes=True)
-        return "Усі нотатки успішно видалені"
+        return "[green]Усі нотатки успішно видалені[/green]"
     elif int(note_to_delete) not in validate_note(name):      
-        raise KeyError("Ви ввели некоректний номер нотатки")
+        raise KeyError("[red]Ви ввели некоректний номер нотатки[/red]")
     else:
         name.notes.delete_note(note=note_to_delete)    
-        return f"Нотатка №{note_to_delete} успішно видалена"
+        return f"[green]Нотатка [yellow bold]№{note_to_delete}[/yellow bold] успішно видалена[/green]"
     
 @input_error
 def add_notes():    
     found_contact =  validate_contact()
     new_notes = input("Додайте нотатки: ")   
     Record.add_notes(found_contact,new_notes)
-    return f"Нотатки були додані до контакту {found_contact}"
+    return f"[green]Нотатки були додані до контакту [/green][yellow bold]{found_contact}[/yellow bold]"
 
 
 @input_error
@@ -203,7 +204,7 @@ def add_birthday(args):
 
     if not Record.add_birthday(find_contact(name), birthday):
         raise WrongDataFormat
-    return f"Birthday for the contact {name} successfully added."
+    return f"[green]Birthday for the contact [yellow bold]{name} [/yellow bold]successfully added.[/green]"
 
 @input_error
 def add_email(args):
@@ -216,9 +217,9 @@ def add_email(args):
         try:
             contact = find_contact(name)
             contact.add_email(email)
-            return f"Email for the contact {name} successfully added."
+            return f"[green]Email for the contact [yellow bold]{name}[/yellow bold] successfully added.[/green]"
         except WrongEmailFormat as e:
-            print(f"Error: {e}")
+            print(f"[red]Error: [/red][yellow bold]{e}[/yellow bold]")
             email = input("Please enter a valid email: ")
 
 @input_error
@@ -226,7 +227,7 @@ def show_birthday(args):
     name = args[0]
 
     birthday = Record.show_birthday(find_contact(name))
-    return f"Contact {name} birthday: {birthday}"
+    return f"[yellow]Contact [bold]{name}[/bold] birthday: [bold]{birthday}[/bold][/yellow]"
 
 
 @input_error
@@ -239,7 +240,7 @@ def show_phone(args):
 def show_all():
     console = Console()
     if not new_book.data:
-        console.print("No contacts available.")
+        console.print("[red]Немає доступних контактів[/red]")
         return
 
     table = Table(title="Книга усіх контактів")

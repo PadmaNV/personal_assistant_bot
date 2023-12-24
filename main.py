@@ -29,7 +29,7 @@ def change_contact(name):
         edit_birthday(name)
     elif choice == "4":
         if len(name.notes) == 0:
-            print( f"Жодної нотатки до контакту {name.name.value} ще не було додано")
+            print( f"[red]Жодної нотатки до контакту [yellow bold]{name.name.value}[/yellow bold] ще не було додано[/red]")
             return
         else:
             try:                        
@@ -39,13 +39,13 @@ def change_contact(name):
                     
     elif choice == "5":
         if len(name.notes) == 0:
-            print( f"Жодної нотатки до контакту {name.name.value} ще не було додано")
+            print( f"[red]Жодної нотатки до контакту [yellow bold]{name.name.value}[/yellow bold] ще не було додано[/red]")
             return
         else:
             print(delete_note(name))      
 
     else:
-        print("Invalid choice. Please enter a valid option number.")
+        print("[red]Invalid choice. Please enter a [/red][yellow bold]valid option number.[/yellow bold]")
 
     return ""
 
@@ -71,43 +71,43 @@ def main():
         main_menu()
 
 
-        print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
+        print("")
         user_input = input("Введи номер команди: ")
 
         if user_input == "1":
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
-            print("Ти вибрав: Добавити контакт")
+            print("[yellow]Ти вибрав: Добавити контакт[/yellow]")
             result = add_contact(None)
             if isinstance(result, Exception):
-                print(f"An error occurred: {result}")
+                print(f"[red]An error occurred: [/red][yellow bold]{result}[/yellow bold]")
             else:
                 print(result)
 
         elif user_input == "2":
             if all_contacts():
                 print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
-                print("Ти вибрав: Обновити контакт")
+                print("[yellow]Ти вибрав: Обновити контакт[yellow]")
                 try:                
                     change_contact(validate_contact())
                 except KeyError as e:
                     print(e)                 
             else:
-                print("Жодного контакту ще не було додано")  
+                print("[red]Жодного контакту ще не було додано[/red]")  
 
         elif user_input == "3": 
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
             if all_contacts():
                 print(add_notes())
             else:
-                print("Жодного контакту ще не було додано")            
+                print("[red]Жодного контакту ще не було додано[/red]")            
         elif user_input == "4":
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
             search_name = input("Введіть ім'я для пошуку, номер телефону, електронну адресу або нотатки: ")
             found_contact = find_contact(search_name)
             if found_contact:
-                print(f"Знайдено контакт: {found_contact}")
+                print(f"[green]Знайдено контакт:[/green] [yellow bold]{found_contact}[/yellow bold]")
             else:
-                print("Контакт не знайдено")
+                print("[red]Контакт не знайдено[/red]")
 
 
         
@@ -128,16 +128,16 @@ def main():
                 result = delete_contact(new_book, contact_name)
                 print(result)
             except ContactNotFound as e:
-                print(f"An error occurred: {e}")
+                print(f"[red]An error occurred: [/red][yellow bold]{e}[/yellow bold]")
                 
         elif user_input == "0":
             new_book.save_to_disk()
-            print("Address book saved to disk.")
-            print("Ну па-па!")
+            print("[green]Address book saved to disk.[/green]")
+            print("[yellow]Ну па-па![/yellow]")
             
             break
         else:
-            print("Invalid command number. Please enter a valid option.")
+            print("[red]]nvalid command number. Please enter a valid option.[/red]")
 
 
 if __name__ == "__main__":
