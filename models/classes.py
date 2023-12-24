@@ -1,3 +1,4 @@
+from rich import print
 from .custom_errors import ContactNotFound, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
 from collections import UserDict, UserList, defaultdict
 from datetime import datetime, timedelta, date
@@ -50,16 +51,16 @@ class Notes(UserList):
     def delete_note(self, note=None, all_notes=False):
         if all_notes:
             self.data = []  # Очистимо весь список нотаток
-            return f"All notes successfully deleted."
+            return f"[green]All notes successfully deleted.[/green]"
 
         if note is not None:
             try:
                 self.data.remove(note)  # Видалимо нотатку
-                return f"Note {note} successfully deleted."
+                return f"[green]Note [yellow bold]{note}[/yellow bold] successfully deleted.[/green]"
             except ValueError:
-                return f"Note {note} not found."
+                return f"[red]Note [yellow bold]{note}[/yellow bold] not found.[/red]"
         else:
-            return "Note or index not provided."        
+            return "[red]Note or index not provided.[/red]"        
 
         
     def add_tag(self,note,tags):
@@ -94,7 +95,7 @@ class Birthday:
                 else:
                     return datetime.strptime(birthday, date_format).date()
             except ValueError:
-                print("Invalid date format. Please enter the date in the format DD.MM.YYYY.")
+                print("[red]Invalid date format. Please enter the date in the format[/red] [yellow bold]DD.MM.YYYY.[/yellow bold]")
                 birthday = input("Enter birthday (DD.MM.YYYY): ")
 
 
@@ -103,7 +104,7 @@ class Phone:
         if phone.isnumeric() and len(phone) == 10:
             self.value = phone
         else:
-            raise WrongPhoneFormat('Invalid phone format.')
+            raise WrongPhoneFormat('[red]Invalid phone format.[/red]')
             
             #print("Invalid phone number. Please enter a 10-digit numeric phone number.")
 
@@ -114,7 +115,7 @@ class Email:
         if re.match(pattern, email):
             self.value = email
         else:
-            raise WrongEmailFormat('Invalid email format. Email must be in the format xxx@xxx.xxx') 
+            raise WrongEmailFormat('[red]Invalid email format. Email must be in the format[/red] [yellow bold]xxx@xxx.xxx[/yellow bold]') 
 
         
 
@@ -158,7 +159,7 @@ class Record:
     def show_birthday(self):
         if self.birthday:
             return self.birthday.value
-        return "not provided"
+        return "[red]not provided[/red]"
 
     def edit_phone(self, phone_to_replace, new_phone):
         to_edit = self.remove_phone(phone_to_replace)
@@ -178,7 +179,7 @@ class Record:
                 self.phones.remove(phone_obj)
             return len(to_remove)
         else:
-            raise PhoneWasNotFound(f"Phone {phone} not found in the record.")
+            raise PhoneWasNotFound(f"[red]Phone [yellow bold]{phone}[/yellow bold] not found in the record.[/red]")
     
     def remove_contact_data(self, contact):
         # Пов'язані значення (phones, birthday, email, notes)
@@ -216,7 +217,7 @@ class Record:
             self.phones.remove(phone_obj)
 
     def __str__(self):
-        return f"Ім'я контакту: {self.name.value}, Телефони: {'; '.join(p.value for p in self.phones)}, День народження: {self.birthday.value}, E-mail: {'; '.join(e.value for e in self.emails)}, Нотатки: {self.notes}"
+        return f"[blue]Ім'я контакту:[/blue] [yellow bold]{self.name.value}[/yellow bold], [blue]Телефони:[/blue] [yellow bold]{'; '.join(p.value for p in self.phones)}[/yellow bold], [blue]День народження:[/blue] [yellow bold]{self.birthday.value}[/yellow bold], [blue]E-mail:[blue] [yellow bold]{'; '.join(e.value for e in self.emails)}[/yellow bold], [blue]Нотатки:[/blue] [yellow bold]{self.notes}[/yellow bold]"
 
 
 class AddressBook(UserDict, Record):
@@ -254,7 +255,7 @@ class AddressBook(UserDict, Record):
         if contact:
             return str(contact)
         else:
-            return "Контакт не знайдено"
+            return "[red]Контакт не знайдено[/red]"
 
     #Denys to do start
     
