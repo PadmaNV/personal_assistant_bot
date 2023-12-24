@@ -182,7 +182,7 @@ def edit_note(name):
 def delete_note(name):
     note_to_delete = input("Обери номер нотатки яку треба видалити, для видалення усіх нотаток введить команду all: ")
     if note_to_delete == 'all':
-        name.notes.delete_note(all=True)
+        name.notes.delete_note(all_notes=True)
         return "Усі нотатки успішно видалені"
     elif int(note_to_delete) not in validate_note(name):      
         raise KeyError("Ви ввели некоректний номер нотатки")
