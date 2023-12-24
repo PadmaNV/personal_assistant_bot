@@ -33,17 +33,33 @@ class Notes(UserList):
             self.data.append(new_note)
             
         
-    def find_note(self, note_text):
+    def find_note_by_value(self, note_text):
         result = []      
         for note in self.data:
             for key, value in note.items():            
                 if note_text in value:
                     result.append(note)
-        return result           
-                
+        return result
+    
+    # def reindex(self):
+    #     l = len(self.data)
+    #     for note in self.data:
 
-    def edit_note(self,note,new_text):        
-        self.data[int(note)-1][int(note)] = new_text  
+
+
+    def find_note_by_key(self, note_key):
+        found_note = ""          
+        for note in self.data:
+            for key, value in note.items():            
+                if int(note_key)==key:
+                    found_note = note                               
+        return found_note
+
+    def edit_note(self,note,key,new_text):
+        if note in self.data:
+            
+            note[int(key)] = new_text        
+        #self.data[int(note)-1][int(note)] = new_text  
 
 
     
