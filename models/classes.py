@@ -54,7 +54,7 @@ class Notes(UserList):
 
         if note is not None:
             try:
-                self.data.remove(note)  # Видалимо нотатку
+                self.data.remove(int(note))  # Видалимо нотатку
                 return f"Note {note} successfully deleted."
             except ValueError:
                 return f"Note {note} not found."
