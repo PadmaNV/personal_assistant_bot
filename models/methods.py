@@ -152,7 +152,7 @@ def edit_birthday(name):
             print("Invalid date format. Please enter the date in the format DD.MM.YYYY.")
 
 def validate_contact():    
-    print(all_contacts())
+    show_all()
     contacts = collect_contacts()
     name_to_edit = prompt("Оберить ім'я контакту із списку вишче: ", completer=completion.WordCompleter(contacts))
     if name_to_edit not in contacts:
@@ -238,12 +238,11 @@ def show_phone(args):
 @input_error
 def show_all():
     console = Console()
-
     if not new_book.data:
         console.print("No contacts available.")
         return
 
-    table = Table(title="Список усіх контактів")
+    table = Table(title="Книга усіх контактів")
     table.add_column("Ім'я", justify="center", style="cyan", no_wrap=True)
     table.add_column("Номер телефону", justify="center", style="magenta", no_wrap=True)
     table.add_column("Мейл", justify="center", style="yellow", no_wrap=True)
