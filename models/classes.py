@@ -154,7 +154,8 @@ class Record:
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
-        return True
+    
+
         
     def add_notes(self,notes):
         self.notes.add_note(notes)
@@ -177,10 +178,8 @@ class Record:
             return self.birthday.value
         return "[red]not provided[/red]"
 
-    def edit_phone(self, phone_to_replace, new_phone):
-        to_edit = self.remove_phone(phone_to_replace)
-        for i in range(to_edit):
-            self.add_phone(new_phone)
+    def edit_phone(self, index, new_phone):
+        self.phones[index] = Phone(new_phone)
 
     def remove_phone(self, phone):
         to_remove = self.check_phone_exist(phone)
@@ -331,4 +330,35 @@ class AddressBook(UserDict, Record):
             if hasattr(record, 'notes'):
                 record.notes.delete_note(note)
         
+
+    def add_phone_menu(self, name):
+        current_contact = self.find(name)
+        print(f"Current phone numbers for {name}:")
+        for i, phone in enumerate(current_contact.phones, 1):
+            print(f"{i}. {phone.value}")
+
+        print("0. Додати новий номер телефону")
+
+        while True:
+            try:
+                choice = int(input("Виберіть номер телефону для редагування (або 0, щоб повернутися): "))
+                if 0 <= choice <= len(current_contact.phones):
+                    break
+                else:
+                    print("Невірний вибір. Будь ласка, введіть правильний номер.")
+            except ValueError:
+                print("Невірний ввід. Будь ласка, введіть номер.")
+
+        if choice == 0:
+            new_phone = input("Введіть новий номер телефону: ")
+            current_contact.add_phone(new_phone)
+            print("Новий номер телефону успішно доданий.")
+        else:
+            new_phone = input("Введіть новий номер телефону: ")
+            current_contact.phones[choice - 1] = Phone(new_phone)
+            print("Номер телефону успішно оновлено.") 
+
+
+
+    
    

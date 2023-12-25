@@ -10,7 +10,7 @@ def change_contact_menu():
     print("   Опції оновлення контакту:")
     print("     1. Додати/редагувати номер телефону")
     print("     2. Редагувати E-mail")
-    print("     3. Редагувати день народження")
+    #print("     3. Редагувати день народження")
     print("     4. Редагувати нотатки")
     print("     5. Видалити нотатки")
     print("     0. Повернутися до головного меню")
@@ -24,11 +24,21 @@ def change_contact(name):
     choice = input("Оберить що саме хочете змінити: ")
 
     if choice == "1":
-        edit_phone(name)
+        try:                        
+            print(edit_phone(name.name.value))
+        except KeyError as e:
+            print(e)  
     elif choice == "2":
-        edit_email(name)
-    elif choice == "3":
-        edit_birthday(name)
+        try:
+            edit_email(name.name.value)
+        except KeyError as e:
+            print(e)
+    #elif choice == "3":
+    #    try:
+    #        current_contact = validate_contact()
+    #        edit_birthday(name.name.value)
+    #    except KeyError as e:
+    #        print(e)
     elif choice == "4":
         if len(name.notes) == 0:
             print( f"[red]Жодної нотатки до контакту [yellow bold]{name.name.value}[/yellow bold] ще не було додано[/red]")
