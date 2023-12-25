@@ -1,3 +1,5 @@
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from rich import print
 from models.methods import *
 from models.contact_operations import delete_contact
@@ -8,7 +10,7 @@ def change_contact_menu():
     print("   Опції оновлення контакту:")
     print("     1. Додати/редагувати номер телефону")
     print("     2. Редагувати E-mail")
-    print("     3. Редагувати день народження")
+    #print("     3. Редагувати день народження")
     print("     4. Редагувати нотатки")
     print("     5. Видалити нотатки")
     print("     0. Повернутися до головного меню")
@@ -22,11 +24,21 @@ def change_contact(name):
     choice = input("Оберить що саме хочете змінити: ")
 
     if choice == "1":
-        edit_phone(name)
+        try:                        
+            print(edit_phone(name.name.value))
+        except KeyError as e:
+            print(e)  
     elif choice == "2":
-        edit_email(name)
-    elif choice == "3":
-        edit_birthday(name)
+        try:
+            edit_email(name.name.value)
+        except KeyError as e:
+            print(e)
+    #elif choice == "3":
+    #    try:
+    #        current_contact = validate_contact()
+    #        edit_birthday(name.name.value)
+    #    except KeyError as e:
+    #        print(e)
     elif choice == "4":
         if len(name.notes) == 0:
             print( f"[red]Жодної нотатки до контакту [yellow bold]{name.name.value}[/yellow bold] ще не було додано[/red]")
@@ -119,7 +131,21 @@ def main():
         elif user_input == "6":
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
             print("")
-            # Тут виклик функціі, яка показує дні народження
+
+            try:
+                days = int(input("Введіть кількість днів для перевірки днів народження: "))
+            except ValueError:
+                print("Невірний ввід. Будь ласка, введіть правильне число.")
+                continue
+
+            upcoming_birthdays = new_book.get_birthdays(days)
+            
+            if upcoming_birthdays:
+                print(f"Дні народження протягом наступних {days} днів:")
+                for birthday_info in upcoming_birthdays:
+                    print(birthday_info)
+            else:
+                print(f"Немає днів народження протягом наступних {days} днів.")
         elif user_input == "9":
             print("////////////////////////////////////////////////////////////////////////////////////////////////////////")
             print("")
