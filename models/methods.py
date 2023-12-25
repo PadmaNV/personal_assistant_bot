@@ -6,7 +6,7 @@ from models import *
 from models.custom_errors import *
 from prompt_toolkit import prompt,completion
 from .classes import *
-from main import change_contact_menu
+from main import change_contact_menu, main
 
 new_book = AddressBook()
 new_book.load_from_disk()
@@ -91,66 +91,105 @@ def add_contact(args):
 
 def edit_phone(name):
     current_contact = find_contact(name)
-    print("Current phone numbers:")
+
+    print("Існуючі номери телефонів:")
     for i, phone in enumerate(current_contact.phones, 1):
         print(f"{i}. {phone.value}")
 
     while True:
         try:
-            choice = int(input("Select a phone number to edit (or 0 to go back): "))
-            if 0 <= choice <= len(current_contact.phones):
+            phone_choice = int(input("Виберіть номер телефону для редагування (або введіть 0 для додавання нового): "))
+            if 0 <= phone_choice <= len(current_contact.phones):
                 break
             else:
-                print("[red]Invalid choice. Please enter a [bold]valid number.[/bold][/red]")
+                print("Невірний вибір. Будь ласка, введіть правильний номер.")
         except ValueError:
-            print("[red]Invalid input. Please enter a [bold]number.[/bold][/red]")
+            print("Невірний ввід. Будь ласка, введіть номер.")
 
-    if choice == 0:
-        return
+    if phone_choice == 0:
+        new_phone = input("Введіть новий номер телефону: ")
+        try:
+            current_contact.add_phone(new_phone)
+            print("Номер телефону успішно доданий.")
+        except WrongPhoneFormat:
+            print("Невірний формат номеру телефону. Будь ласка, введіть правильний номер.")
+    else:
+        new_phone = input("Введіть новий номер телефону: ")
+        try:
+            current_contact.edit_phone(phone_choice - 1, new_phone)
+            print("Номер телефону успішно оновлено.")
+        except WrongPhoneFormat:
+            print("Невірний формат номеру телефону. Будь ласка, введіть правильний номер.")
 
-    new_phone = input("Enter the new phone number: ")
-    current_contact.phones[choice - 1] = Phone(new_phone)
-    print("[green]Phone number successfully updated.[green]")
 
 def edit_email(name):
-    current_contact = find_contact(name)
-    print("Current email addresses:")
-    for i, email in enumerate(current_contact.email, 1):
-        print(f"{i}. {email.value}")
+        current_contact = find_contact(name)
+        print("Існуючі електронні адреси:")
+        for i, email in enumerate(current_contact.emails, 1):
+            print(f"{i}. {email.value}")
 
-    while True:
-        try:
-            choice = int(input("Select an email address to edit (or 0 to go back): "))
-            if 0 <= choice <= len(current_contact.email):
-                break
-            else:
-                print("[red]Invalid choice. Please enter a [bold]valid number.[/bold][/red]")
-        except ValueError:
-            print("[red]Invalid input. Please enter a number.[/red]")
+        while True:
+            try:
+                email_choice = int(input("Виберіть номер електронної адреси для редагування (або введіть 0 для додавання нової): "))
+                if 0 <= email_choice <= len(current_contact.emails):
+                    break
+                else:
+                    print("Невірний вибір. Будь ласка, введіть правильний номер.")
+            except ValueError:
+                print("Невірний ввід. Будь ласка, введіть номер.")
 
-    if choice == 0:
-        return
+        if email_choice == 0:
+            # Додаємо новий email
+            new_email = input("Введіть новий електронний адрес: ")
+            try:
+                current_contact.add_email(new_email)
+                print("Електронний адреса успішно додана.")
+            except WrongEmailFormat:
+                print("Невірний формат електронної адреси. Будь ласка, введіть правильний email.")
+        else:
+            # Редагуємо існуючий email
+            new_email = input("Введіть новий електронний адрес: ")
+            try:
+                current_contact.emails[email_choice - 1] = Email(new_email)
+                print("Електронний адреса успішно оновлена.")
+            except WrongEmailFormat:
+                print("Невірний формат електронної адреси. Будь ласка, введіть правильний email.")
 
-    new_email = input("Enter the new email address: ")
-    try:
-        current_contact.email[choice - 1] = Email(new_email)
-        print("[green]Email address successfully updated.[/green]")
-    except WrongEmailFormat:
-        print("[red]Invalid email address. Please enter a valid email.[/red]")
 
+def change_contact(args):
+    name = args[0]
+    
+    change_contact_menu()
+    choice = input("Enter the number of the option you'd like to choose: ")
+
+    if choice == "1":
+        edit_phone(name)
+    elif choice == "2":
+        edit_email(name)
+    elif choice == "3":
+        edit_birthday(name)
+    elif choice == "3":
+        edit_birthday(name)
+    else:
+        print("Повернення до головного меню")
+        main()
+
+    return ""
+
+  
 def edit_birthday(name):
     current_contact = find_contact(name)
-    current_birthday = current_contact.show_birthday()
-    print(f"Current birthday: [yellow]{current_birthday}[/yellow]")
-
-    while True:
-        try:
-            new_birthday_str = input("Enter the new birthday (DD.MM.YYYY): ")
-            current_contact.add_birthday(Birthday(new_birthday_str).value)
-            print("[green]Birthday successfully updated.[/green]")
-            break
-        except WrongDataFormat:
-            print("[red]Invalid date format. Please enter the date in the format [/red][yellow bold]DD.MM.YYYY.[/yellow bold]")
+    
+    print(f"Current birthday: {current_contact.birthday}")
+    
+    new_birthday_str = input("Enter the new birthday (DD.MM.YYYY): ")
+    
+    new_birthday = Birthday.from_string(new_birthday_str)
+    
+    if current_contact.add_birthday(new_birthday):
+        print("Birthday successfully updated.")
+    else:
+        print("Failed to update birthday. Please enter a valid date format (DD.MM.YYYY).")
 
 def validate_contact():    
     show_all()
