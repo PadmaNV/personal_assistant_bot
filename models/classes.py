@@ -1,5 +1,10 @@
 from rich import print
-from .custom_errors import ContactNotFound, PhoneWasNotFound, WrongEmailFormat, WrongPhoneFormat
+from .custom_errors import (
+    ContactNotFound,
+    PhoneWasNotFound,
+    WrongEmailFormat,
+    WrongPhoneFormat,
+)
 from collections import UserDict, UserList, defaultdict
 from datetime import datetime, timedelta, date
 import calendar
@@ -7,62 +12,54 @@ import pickle
 import re
 import locale
 
-#Aleksey to do start
+# Aleksey to do start
 class Note(UserDict):
     def __init__(self):
         super().__init__()
-        self.tags = [] 
+        self.tags = []
 
     def __str__(self):
-        return ', '.join(f'{key}: {value}' for key, value in self.data.items())    
+        return ", ".join(f"{key}: {value}" for key, value in self.data.items())
 
 
 class Notes(UserList):
     def __init__(self):
-        super().__init__()       
-
-
+        super().__init__()
 
     def add_note(self, notes):
-        divider = r',|;|or|\|'
+        divider = r",|;|or|\|"
         notes_to_add = re.split(divider, notes)
         for note_text in notes_to_add:
             actual_key = len(self.data) + 1
             new_note = Note()
-            new_note[actual_key]=note_text.strip()
+            new_note[actual_key] = note_text.strip()
             self.data.append(new_note)
-            
-        
+
     def find_note_by_value(self, note_text):
-        result = []      
+        result = []
         for note in self.data:
-            for key, value in note.items():            
+            for key, value in note.items():
                 if note_text in value:
                     result.append(note)
         return result
-    
+
     # def reindex(self):
     #     l = len(self.data)
     #     for note in self.data:
 
-
-
     def find_note_by_key(self, note_key):
-        found_note = ""          
+        found_note = ""
         for note in self.data:
-            for key, value in note.items():            
-                if int(note_key)==key:
-                    found_note = note                               
+            for key, value in note.items():
+                if int(note_key) == key:
+                    found_note = note
         return found_note
 
-    def edit_note(self,note,key,new_text):
+    def edit_note(self, note, key, new_text):
         if note in self.data:
-            
-            note[int(key)] = new_text        
-        #self.data[int(note)-1][int(note)] = new_text  
 
-
-    
+            note[int(key)] = new_text
+        # self.data[int(note)-1][int(note)] = new_text
 
     def delete_note(self, note=None, all_notes=False):
         if all_notes:
@@ -76,15 +73,17 @@ class Notes(UserList):
             except ValueError:
                 return f"[red]Note [yellow bold]{note}[/yellow bold] not found.[/red]"
         else:
-            return "[red]Note or index not provided.[/red]"        
+            return "[red]Note or index not provided.[/red]"
 
-        
-    def add_tag(self,note,tags):
-        self.data[int(note)-1].extend(tags)
+    def add_tag(self, note, tags):
+        self.data[int(note) - 1].extend(tags)
 
     def __str__(self):
-        return '; '.join(str(note) for note in self.data)
-#Aleksey to do end
+        return "; ".join(str(note) for note in self.data)
+
+
+# Aleksey to do end
+
 
 class Field:
     def __init__(self, value):
@@ -111,7 +110,9 @@ class Birthday:
                 else:
                     return datetime.strptime(birthday, date_format).date()
             except ValueError:
-                print("[red]Invalid date format. Please enter the date in the format[/red] [yellow bold]DD.MM.YYYY.[/yellow bold]")
+                print(
+                    "[red]Invalid date format. Please enter the date in the format[/red] [yellow bold]DD.MM.YYYY.[/yellow bold]"
+                )
                 birthday = input("Enter birthday (DD.MM.YYYY): ")
 
 
@@ -120,20 +121,20 @@ class Phone:
         if phone.isnumeric() and len(phone) == 10:
             self.value = phone
         else:
-            raise WrongPhoneFormat('[red]Invalid phone format.[/red]')
-            
-            #print("Invalid phone number. Please enter a 10-digit numeric phone number.")
+            raise WrongPhoneFormat("[red]Invalid phone format.[/red]")
+
+            # print("Invalid phone number. Please enter a 10-digit numeric phone number.")
 
 
-class Email:      
+class Email:
     def __init__(self, email):
-        pattern = r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+' 
+        pattern = r"([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
         if re.match(pattern, email):
             self.value = email
         else:
-            raise WrongEmailFormat('[red]Invalid email format. Email must be in the format[/red] [yellow bold]xxx@xxx.xxx[/yellow bold]') 
-
-        
+            raise WrongEmailFormat(
+                "[red]Invalid email format. Email must be in the format[/red] [yellow bold]xxx@xxx.xxx[/yellow bold]"
+            )
 
 
 class Record:
@@ -143,7 +144,6 @@ class Record:
         self.birthday = None
         self.emails = []
         self.notes = Notes()
-       
 
     def check_phone_exist(self, phone):
         phone_record = [record for record in self.phones if record.value == phone]
@@ -154,12 +154,9 @@ class Record:
 
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
-    
 
-        
-    def add_notes(self,notes):
+    def add_notes(self, notes):
         self.notes.add_note(notes)
-
 
     def add_email(self, email):
         self.emails.append(Email(email))
@@ -186,7 +183,7 @@ class Record:
         for phone_obj in to_remove:
             self.phones.remove(phone_obj)
         return len(to_remove)
-    
+
     def remove_phone(self, phone):
         to_remove = self.check_phone_exist(phone)
         if to_remove:
@@ -194,8 +191,10 @@ class Record:
                 self.phones.remove(phone_obj)
             return len(to_remove)
         else:
-            raise PhoneWasNotFound(f"[red]Phone [yellow bold]{phone}[/yellow bold] not found in the record.[/red]")
-    
+            raise PhoneWasNotFound(
+                f"[red]Phone [yellow bold]{phone}[/yellow bold] not found in the record.[/red]"
+            )
+
     def remove_contact_data(self, contact):
         # Пов'язані значення (phones, birthday, email, notes)
         for phone in contact.phones:
@@ -210,14 +209,14 @@ class Record:
             email_value = email.value
             self.remove_email(email_value)
 
-        if hasattr(contact, 'notes'):
+        if hasattr(contact, "notes"):
             for note in contact.notes:
                 self.notes.delete_note(note)
 
     def remove_birthday(self, birthday_value):
         if self.birthday and self.birthday.value == birthday_value:
             self.birthday = None
-            return 1 
+            return 1
         else:
             return 0
 
@@ -239,17 +238,17 @@ class AddressBook(UserDict, Record):
     def add_record(self, record=Record):
         self.data[record.name.value] = record
 
-    #to do Polina
-    #add all parametrs to find
+    # to do Polina
+    # add all parametrs to find
     def find(self, name_or_phone_or_email):
-        
-        
-        #don't touch start
+
+        # don't touch start
         try:
             return self.data[name_or_phone_or_email]
         except:
             return False
-        #don't touch end
+        # don't touch end
+
     def find(self, name_or_phone_or_email_or_note):
         for contact in self.data.values():
             if name_or_phone_or_email_or_note == contact.name.value:
@@ -264,7 +263,7 @@ class AddressBook(UserDict, Record):
                 if name_or_phone_or_email_or_note in str(note):
                     return contact
         return False
-         
+
     def display_contact_info(self, name_or_phone_or_email_or_note):
         contact = self.find(name_or_phone_or_email_or_note)
         if contact:
@@ -272,8 +271,8 @@ class AddressBook(UserDict, Record):
         else:
             return "[red]Контакт не знайдено[/red]"
 
-    #Denys to do start
-    
+    # Denys to do start
+
     def get_birthdays(self, days_until_birthday):
         matching_birthdays = []
         today = datetime.today().date()
@@ -287,7 +286,7 @@ class AddressBook(UserDict, Record):
             if isinstance(birthday.value, date):
                 birthday_date = birthday.value
             else:
-                birthday_date = datetime.strptime(birthday.value, '%d.%m.%Y').date()
+                birthday_date = datetime.strptime(birthday.value, "%d.%m.%Y").date()
 
             birthday_this_year = birthday_date.replace(year=today.year)
 
@@ -305,13 +304,11 @@ class AddressBook(UserDict, Record):
 
         return matching_birthdays
 
+    # ... (other classes and functions)
 
-# ... (other classes and functions)
+    # Update the get_birthdays_per_week method in the main block to call the new get_birthdays method
 
-# Update the get_birthdays_per_week method in the main block to call the new get_birthdays method
-
-    #Denys to do end
-
+    # Denys to do end
 
     def save_to_disk(self, filename="address_book.pkl"):
         with open(filename, "wb") as file:
@@ -327,9 +324,8 @@ class AddressBook(UserDict, Record):
 
     def delete_note(self, note):
         for record in self.data.values():
-            if hasattr(record, 'notes'):
+            if hasattr(record, "notes"):
                 record.notes.delete_note(note)
-        
 
     def add_phone_menu(self, name):
         current_contact = self.find(name)
@@ -341,7 +337,11 @@ class AddressBook(UserDict, Record):
 
         while True:
             try:
-                choice = int(input("Виберіть номер телефону для редагування (або 0, щоб повернутися): "))
+                choice = int(
+                    input(
+                        "Виберіть номер телефону для редагування (або 0, щоб повернутися): "
+                    )
+                )
                 if 0 <= choice <= len(current_contact.phones):
                     break
                 else:
@@ -356,9 +356,4 @@ class AddressBook(UserDict, Record):
         else:
             new_phone = input("Введіть новий номер телефону: ")
             current_contact.phones[choice - 1] = Phone(new_phone)
-            print("Номер телефону успішно оновлено.") 
-
-
-
-    
-   
+            print("Номер телефону успішно оновлено.")

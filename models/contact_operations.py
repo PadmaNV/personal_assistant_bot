@@ -1,5 +1,6 @@
 from .custom_errors import *
 
+
 def delete_contact(address_book, name):
     if name in address_book.data:
         contact = address_book.data.pop(name)
@@ -30,7 +31,7 @@ def delete_contact(address_book, name):
                     print(f"Email {email_value} not found for contact {name}.")
 
         # метод delete_note у класі Notes
-        if hasattr(contact, 'notes'):
+        if hasattr(contact, "notes"):
             for note in contact.notes:
                 try:
                     address_book.delete_note(note)
